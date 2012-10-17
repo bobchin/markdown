@@ -50,7 +50,7 @@
 > -A RH-Firewall-1-INPUT -p 51 -j ACCEPT  
 > -A RH-Firewall-1-INPUT -p udp --dport 5353 -d 224.0.0.251 -j ACCEPT  
 > -A RH-Firewall-1-INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT  
-> -A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT  
+> -A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 2222 -j ACCEPT  
 > -A RH-Firewall-1-INPUT -j REJECT --reject-with icmp-host-prohibited  
 > COMMIT  
 
@@ -118,7 +118,15 @@
 > git clone https://github.com/Shougo/neobundle.vim neobundle.vim  
 > vi にて :NeoBundleInstall  
 
+## PHP
+> sudo yum install php php-gd php-mbstring php-pdo php-pear  
+> vi /etc/sysconfig/iptables  
+> -A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT  
 
+- xdebug   
+> sudo yum install php-devel  
+> sudo pecl install xdebug  
+> sudo echo 'extension=xdebug.so' > /etc/php.d/xdebug.ini  
 
 
 
