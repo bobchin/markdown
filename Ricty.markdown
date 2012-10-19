@@ -27,6 +27,7 @@
 
 ## Windows での作成方法
 参考  
+<<<<<<< HEAD
 - [http://blog.remora.cx/2012/01/vim-powerline.html](http://blog.remora.cx/2012/01/vim-powerline.html)  
 
 - cygwin インストール  
