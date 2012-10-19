@@ -11,10 +11,10 @@
 > mkdir font  
 > cd font  
 >  
-> \# Inconsolata  
+> # Inconsolata  
 > wget http://levien.com/type/myfonts/Inconsolata.otf  
 >  
-> \# Migu 1M  
+> # Migu 1M  
 > wget "http://sourceforge.jp/frs/redir.php?m=iij&f=%2Fmix-mplus-ipa%2F56156%2Fmigu-1m-20120411-2.zip" -O migu-1m-20120411-2.zip  
 > unzip migu-1m-20120411-2.zip  
 > cp migu-1m-20120411-2/*.ttf ./  
