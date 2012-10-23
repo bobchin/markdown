@@ -58,6 +58,7 @@ AllowOverride None => All
 $componentsの設定  
 
 > AppController.php  
+
 ```
 種類ごとに設定できる
 public $components = array(
@@ -90,6 +91,7 @@ public $components = array(
 通常はForm認証しか使わないので以下のようになるはず。  
 使用出来る共通設定も追記しておく。  
 > AppController.php  
+
 ```
 App::uses('AuthComponent', 'Controller/Component');
 
