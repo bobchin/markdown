@@ -56,7 +56,7 @@ AllowOverride None => All
 通常は全体に認証をかけるのでAppControllerに記述する。  
 - beforeFilter()  
 
-$componentsの設定  
+#### $componentsの設定  
 
 > AppController.php  
 
@@ -122,6 +122,45 @@ Digest認証のみ
 'nonce'  => 'xxxx', // 認証で使用されるnonce値（cnonceか?）（ランダム値）。指定しない場合はuniqid()
 'qop'    => 'auth', // 
 'opaque' => '', // 指定しない場合はmd5($settings['realm'])
+
+
+#### beforeFilter()の設定  
+
+
+### その他の設定
+```
+public $components = array(
+    'Auth' => array(
+        'authenticate' => arrary(
+            'Form' => array(),
+        ),
+
+        // ログイン処理をするアクション。デフォルトは/users/login
+        'loginAction' => array('controller' => '', 'action' => ''),
+
+        // これを指定しない場合は認証確認後に認証前にアクセスしたページにリダイレクトする。
+        // 認証後固定の宛先にリダイレクトしたい場合はこれを設定する。
+        'loginRedirect' => array('controller' => '', 'action' => ''),
+
+        // これを指定しない場合は、ログオフ後にloginActionのページにリダイレクトする。
+        // ログオフ後固定の宛先にリダイレクトしたい場合はこれを設定する。
+        'logoutRedirect' => array('controller' => '', 'action' => ''),
+
+        // ログインエラーのメッセージ
+        // セッションに"auth"というキーで保存される。セッションの設定は$component['Auth']['flash']を参照。
+        'authError' => 'このページを表示するにはログインする必要があります。',
+
+        // flashメッセージで使用するセッションの設定
+        'flash' => array(
+           'element' => 'default',   // SessionHelper::flash() を参照。表示する際のViewのエレメントを指定する。
+                                     // "default" の場合DIVで囲まれ、空の場合はメッセージそのまま表示される。
+           'key' => 'auth',          // セッションのキー
+           'params' => array(),      // エレメントにセットされるパラメータ
+        ),
+    ),
+);
+
+```
 
 
 ### 独自のAuthentication（認証）オブジェクトを作る
