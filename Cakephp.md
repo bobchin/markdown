@@ -55,10 +55,61 @@ AllowOverride None => All
 通常は全体に認証をかけるのでAppControllerに記述する。  
 - beforeFilter()  
 
+$componentsの設定  
 
+> AppController.php  
+```
+種類ごとに設定できる
+public $components = array(
+    'Auth' => array(
+        'authenticate' => arrary(
+            'Form' => array('userModel' => 'UserTbl'),
+            'Basic' => array('userModel' => 'UserTbl'),
+            'Digest' => array('userModel' => 'UserTbl'),
+        ),
+    ),
+);
 
+しかし冗長なので以下のようにできる。
+AuthComponent::ALL 欄に各認証共通の設定を共有できる。
+App::uses('AuthComponent', 'Controller/Component');
+public $components = array(
+    'Auth' => array(
+        'authenticate' => arrary(
+            AuthComponent::ALL => array(
+                'userModel' => 'UserTbl'
+            ),
+            'Form',
+            'Basic',
+            'Digest',
+        ),
+    ),
+);
+```
 
+通常はForm認証しか使わないので以下のようになるはず。  
+使用出来る共通設定も追記しておく。  
+> AppController.php  
+```
+App::uses('AuthComponent', 'Controller/Component');
 
+public $components = array(
+    'Auth' => array(
+        'authenticate' => arrary(
+            AuthComponent::ALL => array(
+                'userModel' => 'UserTbl',                       // 使用するモデル名。指定しない場合は"User"
+                'fields' => array(
+                    'username' => 'user_name',                  // ユーザIDとして使用するフィールド名。指定しない場合は"username"
+                    'password' => 'pass',                       // パスワードとして使用するフィールド名。指定しない場合は"password"
+                    'scope' => array('UserTbl.is_active' => 1), // モデルに渡す"condition"オプション。
+                    'contain' => array('UserTbl'),              // モデルに渡す"contain" オプション。モデルで要確認
+                ),
+            ),
+            'Form',
+        ),
+    ),
+);
+```
 
 
 
