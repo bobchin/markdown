@@ -173,6 +173,14 @@ class MyAuthenticate extends FormAuthenticate
 {
     public function _password($password)
     {
+        return MyAuthenticate::crypt($password);
+    }
+
+    /*
+     * 保存時に使用できるようにstaticに
+     */
+    public static function crypt($password)
+    {
         App::uses('Security', 'Utility');
         return Security::hash($password, 'sha1');
     }
