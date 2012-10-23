@@ -39,6 +39,7 @@ AllowOverride None => All
 
 ## AuthComponent の使い方
 
+### 種類
 種類は３つ
 - Form   : Form の POST を使用して認証する
 - Basic  : HTTP の Basic 認証を使用する
@@ -113,7 +114,69 @@ public $components = array(
 );
 ```
 
+あまり使用しないと思うけど。以下の設定もある。  
+Basic認証のみ
+'realm' => 'xxxx',  // 認証される realm（認証領域）。指定しない場合はenv('SERVER_NAME')
+Digest認証のみ
+'realm'  => 'xxxx', // 認証される realm（認証領域）。指定しない場合はenv('SERVER_NAME')
+'nonce'  => 'xxxx', // 認証で使用されるnonce値（cnonceか?）（ランダム値）。指定しない場合はuniqid()
+'qop'    => 'auth', // 
+'opaque' => '', // 指定しない場合はmd5($settings['realm'])
 
+
+### 独自のAuthentication（認証）オブジェクトを作る
+
+雛形  
+
+> app/Controller/Component/Auth/XXXAuthenticate.php
+
+```
+<?php
+App::uses('BaseAuthenticate', 'Controller/Component/Auth');
+
+class XXXAuthenticate extends BaseAuthenticate
+{
+    public function authenticate(CakeRequest $request, CakeResponse $response)
+    {
+        $this->settings['userModel'] // コントローラで指定した値を取得できる
+        $result = $this->_findUser('user', 'pass'); // データベースから検索する場合に使用できる
+        return false OR $result;
+    }
+}
+```  
+
+> AppController.php
+
+```
+public $components = array(
+    'Auth' => array(
+        'authenticate' => arrary(
+            AuthComponent::ALL => array(
+                'userModel' => 'UserTbl',
+                ),
+            ),
+            'XXX',
+        ),
+    ),
+);
+```
+
+### パスワード暗号化ロジックがCakePHPのものと違う場合
+
+> app/Controller/Component/Auth/MyAuthenticate.php
+
+```
+<?php
+App::uses('FormAuthenticate', 'Controller/Component/Auth');
+
+class MyAuthenticate extends FormAuthenticate
+{
+    public function _password($password)
+    {
+        return sha1($password);
+    }
+}
+```  
 
 
 
