@@ -126,6 +126,21 @@ Digest認証のみ
 
 #### beforeFilter()の設定  
 
+※注意 AppControllerでも設定できるが、その場合はすべてのコントローラが対象になるので注意。  
+index を指定した場合は、すべてのコントローラのindexが許可/拒否される。  
+基本的には各コントローラで指定するほうがいい。  
+
+> XXXController.php
+
+```
+public function beforeFilter()
+{
+    parent::beforeFilter();
+    $this->Auth->allow('index', 'logout');
+    $this->Auth->deny('view', 'login');
+}
+```
+
 
 ### その他の設定
 ```
