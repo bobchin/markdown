@@ -187,7 +187,17 @@ class MyAuthenticate extends FormAuthenticate
 }
 ```  
 
+### ログインユーザの情報
 
+AuthComponentのuserメソッドで取得  
+取得できるデータはAuthenticateクラスのautheticateメソッドで返した値  
+引数にキーを指定可能。指定しない場合は全データの配列。
+```
+<?php
+AuthComponent::user('id')
+
+$this->Auth->user('id');
+```
 
 
 
