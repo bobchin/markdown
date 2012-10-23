@@ -173,7 +173,8 @@ class MyAuthenticate extends FormAuthenticate
 {
     public function _password($password)
     {
-        return sha1($password);
+        App::uses('Security', 'Utility');
+        return Security::hash($password, 'sha1');
     }
 }
 ```  
