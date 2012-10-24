@@ -115,13 +115,13 @@ public $components = array(
 ```
 
 あまり使用しないと思うけど。以下の設定もある。  
-Basic認証のみ
-'realm' => 'xxxx',  // 認証される realm（認証領域）。指定しない場合はenv('SERVER_NAME')
-Digest認証のみ
-'realm'  => 'xxxx', // 認証される realm（認証領域）。指定しない場合はenv('SERVER_NAME')
-'nonce'  => 'xxxx', // 認証で使用されるnonce値（cnonceか?）（ランダム値）。指定しない場合はuniqid()
-'qop'    => 'auth', // 
-'opaque' => '', // 指定しない場合はmd5($settings['realm'])
+Basic認証のみ  
+'realm' => 'xxxx',  // 認証される realm（認証領域）。指定しない場合はenv('SERVER_NAME')  
+Digest認証のみ  
+'realm'  => 'xxxx', // 認証される realm（認証領域）。指定しない場合はenv('SERVER_NAME')  
+'nonce'  => 'xxxx', // 認証で使用されるnonce値（cnonceか?）（ランダム値）。指定しない場合はuniqid()  
+'qop'    => 'auth', //  
+'opaque' => '', // 指定しない場合はmd5($settings['realm'])  
 
 
 #### beforeFilter()の設定  
