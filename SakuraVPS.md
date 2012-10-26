@@ -189,6 +189,24 @@ sudo rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-7.noa
 enabled=0
 ```
 
+> /etc/yum.repos.d/CetOS-Base.repo  
+
+```
+[base]
+...
+priority=1
+
+[updates]
+...
+priority=1
+
+[extras]
+...
+priority=1
+```
+
+
+
 
 
 
