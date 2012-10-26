@@ -156,6 +156,39 @@ sudo pecl install xdebug
 sudo echo 'extension=xdebug.so' > /etc/php.d/xdebug.ini  
 ```
 
+## yum
+
+### repoforge
+- http://repoforge.org/use/
+
+```
+sudo rpm -ivh http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.2-2.el6.rf.x86_64.rpm
+```
+
+### remi
+```
+sudo rpm --import http://rpms.famillecollet.com/RPM-GPG-KEY-remi
+sudo rpm -ivh http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+```
+
+### epel
+※さくらVPSではすでに入っている  
+- http://support.sakura.ad.jp/manual/vps/ossetup.html
+
+```
+sudo rpm --import http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-6
+sudo rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-7.noarch.rpm
+```
+
+### 設定
+> /etc/yum.repos.d/rpmforge.repo  
+> /etc/yum.repos.d/remi.repo
+> /etc/yum.repos.d/epel.repo
+
+```
+enabled=0
+```
+
 
 
 
