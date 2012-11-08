@@ -14,6 +14,38 @@ CREATE TABLE cake_sessions (
 );
 ```
 
+**bake を使用する場合**  
+
+```
+cd app/
+./Console/cake scheme create sessions  
+
+Welcome to CakePHP v2.2.x Console
+---------------------------------------------------------------
+App : app
+Path: /xxx/xxx/cakephp22x/app/
+---------------------------------------------------------------
+Cake Schema Shell
+---------------------------------------------------------------
+
+The following table(s) will be dropped.
+cake_sessions
+Are you sure you want to drop the table(s)? (y/n)
+[n] > y
+Dropping table(s).
+cake_sessions updated.
+
+The following table(s) will be created.
+cake_sessions
+Are you sure you want to create the table(s)? (y/n)
+[y] >
+Creating table(s).
+cake_sessions updated.
+End create.
+```
+
+
+
 設定ファイルを編集  
 > app/Config/core.php  
 
@@ -23,7 +55,10 @@ Configure::write('Session', array(
 ));
 ```
 
-### 独自モデルを使用する場合（あまりないはず）
+
+
+
+## 独自モデルを使用する場合（あまりないはず）
 > app/Model/MySession.php
 
 ```
