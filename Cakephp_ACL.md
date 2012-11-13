@@ -100,6 +100,60 @@ Console/cake schema create DbAcl
 - lft/rght    : SQL の入れ子集合で使う（http://gihyo.jp/dev/serial/01/sql_academy2/000501）
 
 
+## ACL Behavior
+
+これを使用すると、モデルとARO/ACOを透過的に扱うことができるようになる。
+
+> 設定  
+```
+// ACO モードとして使用する場合（デフォルト）  
+class Post extends AppModel {  
+	public $actsAs = array('type' => 'controlled');  
+}  
+
+// ARO モードとして使用する場合  
+class Post extends AppModel {  
+	public $actsAs = array('type' => 'requester');  
+}  
+
+// 両モードとして使用する場合  
+class Post extends AppModel {  
+	public $actsAs = array('type' => 'both');  
+}  
+```
+
+モデルに parentNode() メソッドを追加する  
+これは Acl ビヘイビアで親子関係を決定するのに使用する。  
+返り値は、親を表現するデータを返す。  
+親の場合は **"null"**。子の場合は **親モデルのデータ** にする。
+```
+class User extends AppModel {
+	public function parentNode()
+	{
+		if (!$this->id && empty($this->data)) {
+			return null;
+		}
+		if (isset($this->data['User']['group_id'])) {
+			$groupId = $this->data['User']['group_id'];
+		} else {
+			$groupId = $this->field('group_id');
+		}
+
+		if (!$groupId) {
+			return null;
+		} else {
+			return array('Group' => array('id' => $groupId));
+		}
+	}
+}
+
+class Group extends AppModel {
+	public function parentNode()
+	{
+		return null;
+	}
+}
+```
 
 
 
