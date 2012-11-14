@@ -305,8 +305,9 @@ public function create_assignment()
 ACO をコントローラとアクションで指定する場合に、全コントローラ・アクションを設定するのは大変だが、
 一括して登録してくれるプラグイン。
 
+> app/Config/bootstrap.php に以下を追記
+
 ```
-// app/Config/bootstrap.php に以下を追記
 CakePlugin::load('AclExtras');
 ```
 
@@ -345,6 +346,7 @@ public function create_assignment()
 これを使用すると、モデルとARO/ACOを透過的に扱うことができるようになる。
 
 > 設定
+
 ```
 // ACO モードとして使用する場合（デフォルト）
 class Post extends AppModel {
