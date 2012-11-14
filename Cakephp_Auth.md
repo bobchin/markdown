@@ -8,20 +8,22 @@
 - Basic  : HTTP の Basic 認証を使用する
 - Digest : HTTP の Digest 認証を使用する
 
-※上記認証は複数同時使用することができ、設定した順にチェックされる。  
-　この場合、一旦チェックOKになったものは次のチェックはされずにOKとなる。  
+※上記認証は複数同時使用することができ、設定した順にチェックされる。
+　この場合、一旦チェックOKになったものは次のチェックはされずにOKとなる。
 
 ### 設定方法
+
 - 設定箇所はController内の2箇所
-- $components  
+- $components
 ※設定位置に注意。  
 =>末端のコントローラの場合そのコントローラのみ対象となる。
-通常は全体に認証をかけるのでAppControllerに記述する。  
-- beforeFilter()  
+通常は全体に認証をかけるのでAppControllerに記述する。
+
+- beforeFilter()
 
 #### $componentsの設定  
 
-> AppController.php  
+> AppController.php
 
 ```
 種類ごとに設定できる
@@ -52,9 +54,10 @@ public $components = array(
 );
 ```
 
-通常はForm認証しか使わないので以下のようになるはず。  
-使用出来る共通設定も追記しておく。  
-> AppController.php  
+通常はForm認証しか使わないので以下のようになるはず。
+使用出来る共通設定も追記しておく。
+
+> AppController.php
 
 ```
 App::uses('AuthComponent', 'Controller/Component');
@@ -77,21 +80,23 @@ public $components = array(
 );
 ```
 
-あまり使用しないと思うけど。以下の設定もある。  
-Basic認証のみ  
-'realm' => 'xxxx',  // 認証される realm（認証領域）。指定しない場合はenv('SERVER_NAME')  
-Digest認証のみ  
-'realm'  => 'xxxx', // 認証される realm（認証領域）。指定しない場合はenv('SERVER_NAME')  
-'nonce'  => 'xxxx', // 認証で使用されるnonce値（cnonceか?）（ランダム値）。指定しない場合はuniqid()  
-'qop'    => 'auth', //  
-'opaque' => '', // 指定しない場合はmd5($settings['realm'])  
+あまり使用しないと思うけど。以下の設定もある。
+
+    Basic認証のみ
+    'realm' => 'xxxx',  // 認証される realm（認証領域）。指定しない場合はenv('SERVER_NAME')
+
+    Digest認証のみ
+    'realm'  => 'xxxx', // 認証される realm（認証領域）。指定しない場合はenv('SERVER_NAME')
+    'nonce'  => 'xxxx', // 認証で使用されるnonce値（cnonceか?）（ランダム値）。指定しない場合はuniqid()
+    'qop'    => 'auth', //
+    'opaque' => '', // 指定しない場合はmd5($settings['realm'])
 
 
 #### beforeFilter()の設定  
 
-※注意 AppControllerでも設定できるが、その場合はすべてのコントローラが対象になるので注意。  
-index を指定した場合は、すべてのコントローラのindexが許可/拒否される。  
-基本的には各コントローラで指定するほうがいい。  
+※注意 AppControllerでも設定できるが、その場合はすべてのコントローラが対象になるので注意。
+index を指定した場合は、すべてのコントローラのindexが許可/拒否される。
+基本的には各コントローラで指定するほうがいい。
 
 > XXXController.php
 
@@ -143,7 +148,7 @@ public $components = array(
 
 ### 独自のAuthentication（認証）オブジェクトを作る
 
-雛形  
+**雛形**
 
 > app/Controller/Component/Auth/XXXAuthenticate.php
 
@@ -178,7 +183,7 @@ public $components = array(
 );
 ```
 
-### パスワード暗号化ロジックがCakePHPのものと違う場合
+#### パスワード暗号化ロジックがCakePHPのものと違う場合
 
 > app/Controller/Component/Auth/MyAuthenticate.php
 
@@ -202,7 +207,71 @@ class MyAuthenticate extends FormAuthenticate
         return Security::hash($password, 'sha1');
     }
 }
-```  
+```
+
+#### セッションに保存するフィールドを指定できるようにする
+
+> app/Controller/Component/Auth/MyAuthenticate.php
+
+```
+<?php
+App::uses('FormAuthenticate', 'Controller/Component/Auth');
+
+class MyAuthenticate extends FormAuthenticate
+{
+    protected function _findUser($username, $password) {
+        $userModel = $this->settings['userModel'];
+        list($plugin, $model) = pluginSplit($userModel);
+        $fields = $this->settings['fields'];
+
+        $conditions = array(
+            $model . '.' . $fields['username'] => $username,
+            $model . '.' . $fields['password'] => $this->_password($password),
+        );
+        if (!empty($this->settings['scope'])) {
+            $conditions = array_merge($conditions, $this->settings['scope']);
+        }
+
+        // 追記 //////////////////////////////////////////////
+        $get_fields = array();
+        if (!empty($this->settings['fields']['fields'])) {
+            $get_fields = $this->settings['fields']['fields'];
+        }
+        //////////////////////////////////////////////////////
+
+        $result = ClassRegistry::init($userModel)->find('first', array(
+            // 追記 ////////////////
+            'fields' => $get_fields,
+            'conditions' => $conditions,
+            'recursive' => (int)$this->settings['recursive'],
+            'contain' => $this->settings['contain'],
+        ));
+        if (empty($result) || empty($result[$model])) {
+            return false;
+        }
+        $user = $result[$model];
+        unset($user[$fields['password']]);
+        unset($result[$model]);
+        return array_merge($user, $result);
+    }
+}
+```
+
+```
+public $components = array(
+    'Auth' => array(
+        'authenticate' => arrary(
+            AuthComponent::ALL => array(
+                'userModel' => 'UserTbl',
+                'fields' => array('username', 'password', 'title'),
+                'contain' => array('User'),
+            ),
+        ),
+        'My',
+    ),
+);
+```
+
 
 ### ログインユーザの情報
 
