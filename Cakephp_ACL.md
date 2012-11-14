@@ -430,7 +430,10 @@ class AppController extends Controller {
 		'Acl',
 		'Auth' => array(
 			'authorize' => array(
-				'Actions' => array('actionPath' => 'controllers'),		// ActionsAuthorize
+				'Actions' => array(										// ActionsAuthorize
+					'actionPath' => 'controllers',
+					'userModel' => array('User', 'Group'),
+				),		
 			 // 'Controller' => array(),								// ControllerAuthorize
 			 // 'Crud' => array('actionPath' => 'controllers'),			// CrudAuthorize
 			),
