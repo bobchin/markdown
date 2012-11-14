@@ -300,6 +300,26 @@ public function create_assignment()
 ```
 
 
+> AclExtras プラグイン
+
+ACO をコントローラとアクションで指定する場合に、全コントローラ・アクションを設定するのは大変だが、
+一括して登録してくれるプラグイン。
+
+```
+// app/Config/bootstrap.php に以下を追記
+CakePlugin::load('AclExtras');
+```
+
+```
+cd app/Plugin
+git clone git://github.com/markstory/acl_extras.git AclExtras
+
+./Console/cake AclExtras.AclExtras aco_sync
+```
+
+
+
+
 ## 権限を確認する
 
 ```
@@ -419,6 +439,4 @@ class AppController extends Controller {
 	);
 }
 ```
-
-
 
