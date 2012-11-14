@@ -420,9 +420,9 @@ lib\Cake\Controller\Component\Auth\\*Authorize.php を参照
 
 ### 設定
 
-actionPath: 判断する ACO の先頭につける文字（全体のROOTを指定するのに使用する）
-userModel : ARO とするオブジェクトのモデル名
-actionMap : aro_aco の _create, _delete, _read, _write にマッピングするキー
+- actionPath: 判断する ACO の先頭につける文字（全体のROOTを指定するのに使用する）
+- userModel : ARO とするオブジェクトのモデル名のリスト
+- actionMap : aro_aco の _create, _delete, _read, _write にマッピングするキー
 
 > AppController.php
 
