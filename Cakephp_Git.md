@@ -67,7 +67,7 @@ git pull
 ```
 define('APP_DIR', 				 'app_hoge');
 define('ROOT', 					 '/var/www/cakephp/app');
-define('CAKE_CORE_INCLUDE_PATH', '/var/www/cakephp/cakecore');
+define('CAKE_CORE_INCLUDE_PATH', '/var/www/cakephp/cakecore/lib');
 ```
 
 
