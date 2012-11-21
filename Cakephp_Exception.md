@@ -4,7 +4,7 @@
 
 > app/Config/core.php
 
-```
+```php
 Configure::write('Exception', array(
     'handler' => 'ErrorHandler::handleException',
     'renderer' => 'ExceptionRenderer',
@@ -23,7 +23,7 @@ consoleHander: コンソール使用時に例外を処理するハンドラ
 
 > 使用例
 
-```
+```php
 class SampleController {
 	public function view($id)
 	{
@@ -61,17 +61,40 @@ $this->layout = 'my_layout';
 ```
 を指定する
 
+
 ## 独自の例外クラス
 
+CakeException クラスを継承する。通常は 500 エラーになるので、
+テンプレートは error500.ctp が使用される。
+
+```php
+class MissingWidgetException extends CakeException {
+};
 ```
+
+独自のテンプレートを使用したい場合は、クラス名から *Exception* を除いた部分の変数名(Inflector::variable())。
+`app/View/Errors/missing_widget.ctp`
+を作成する。
+
+テンプレートに値を渡したい場合は例外スロー時に指定する。
+またエラーメッセージのテンプレートも指定できる。
+
+```php
 class MissingWidgetException extends CakeException {
     protected $_messageTemplate = '%s Seems that %s is missing.';
 }
 
-throw new MissingWidgetException(array('[Error]', 'Pointy'));
-=> [Error] Seems that Pointy is missing.'
+throw new MissingWidgetException(array(
+	'title' => [Error]', 
+	'widget' => 'Pointy',
+));
+```
 
-throw new MissingWidgetException(array('[Error]', 'Pointy'), 403);
+> app/View/Errors/missing_widget.ctp
+
+```
+Error Contents: <?php echo $name; ?>	// [Error] Seems that Pointy is missing.
+widget: <?php echo $widget; ?>			// Pointy
 ```
 
 
