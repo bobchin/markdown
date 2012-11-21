@@ -65,11 +65,19 @@ git pull
 
 /var/www/cakephp/app/app_hoge/webroot/{index.php, test.php}
 ```
-define('APP_DIR', 				 'app_hoge');
-define('ROOT', 					 '/var/www/cakephp/app');
-define('CAKE_CORE_INCLUDE_PATH', '/var/www/cakephp/cakecore/lib');
+define('ROOT', 					 '/var/www/cakephp');
+define('APP_DIR', 				 'app/app_hoge');
+define('CAKE_CORE_INCLUDE_PATH', ROOT . DS . 'cakecore/lib');
 ```
 
+プラグインやベンダーを使用する場合は
+
+> app/Config/bootstrap.php
+
+```
+App::build(array('Plugin' => array(ROOT . DS . 'plugins' . DS)));
+App::build(array('Vendor' => array(ROOT . DS . 'vendors' . DS)));
+```
 
 
 
