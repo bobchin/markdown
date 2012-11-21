@@ -33,6 +33,8 @@ CakeLog::config('bar', array(
 - CakeLog::emergency('msg', ['scope']);
 - CakeLog::alert('msg', ['scope']);
 - CakeLog::critical('msg', ['scope']);
+- CakeLog::error('msg', ['scope']);
+- CakeLog::warning('msg', ['scope']);
 - CakeLog::notice('msg', ['scope']);
 - CakeLog::debug('msg', ['scope']);
 - CakeLog::info('msg', ['scope']);
