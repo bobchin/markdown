@@ -70,7 +70,7 @@ define('APP_DIR', 				 'app/app_hoge');
 define('CAKE_CORE_INCLUDE_PATH', ROOT . DS . 'cakecore/lib');
 ```
 
-プラグインやベンダーを使用する場合は
+*プラグインやベンダーを使用する場合は*
 
 > app/Config/bootstrap.php
 
@@ -79,9 +79,32 @@ App::build(array('Plugin' => array(ROOT . DS . 'plugins' . DS)));
 App::build(array('Vendor' => array(ROOT . DS . 'vendors' . DS)));
 ```
 
+*DebugKit を使用する*
 
+```
+cd /var/www/cakephp/plugins
+git clone git://github.com/cakephp/debug_kit.git
+```
 
+> app/Config/bootstrap.php
 
+```
+App::build(array('Plugin' => array(ROOT . DS . 'plugins' . DS)));
+CakePlugin::load('DebugKit');
+```
+
+> app/Controller/AppController.php
+
+```
+$components = array('DebugKit.Toolbar');
+```
+
+> app/View/Layouts/default.ctp
+
+```
+以下を削除もしくはコメントアウト
+<?php // echo $this->element('sql_dump'); ?>
+```
 
 
 
