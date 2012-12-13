@@ -21,6 +21,7 @@ git submodule add -f git://github.com/ichikaway/cakeplus.git plugins/cakeplus
 git submodule add -f git://github.com/ichikaway/xformHelper.git plugins/xformHelper
 git submodule add -f git://github.com/fusic/filebinder.git plugins/filebinder
 git submodule add -f git://github.com/slywalker/TwitterBootstrap.git plugins/TwitterBootstrap
+git submodule add -f git://github.com/markstory/acl_extras.git plugins/acl_extras
 
 # update
 # git fetch
