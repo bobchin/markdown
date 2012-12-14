@@ -44,12 +44,16 @@ Ctrl+Alt+o で表示
 - "Package Control"
 - "Theme - Soda": テーマ
 - "ZenCoding": 
-
+- "SublimeServer"
+- "Terminal"
+- "Alignment"
+- "SublimeCodeIntel"
+- "AutoFileName"
+- "SublimeLinter"
 
 ## 参考
 
 - <http://dev.classmethod.jp/tool/html-corder-sublime-text-2-customize/>
-
 
 
 
