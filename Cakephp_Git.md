@@ -107,7 +107,40 @@ $components = array('DebugKit.Toolbar');
 ```
 
 
+## submodule版
 
+> create.sh
+
+```
+#!/bin/sh
+
+# トップフォルダ作成
+mkdri cakephp
+cd cakephp
+
+# コアファイル取得
+git clone git://github.com/cakephp/cakephp.git cakecore
+
+# plugins
+git submodule add -f git://github.com/cakephp/debug_kit.git plugins/debug_kit
+git add -f plugins/debug_kit .gitmodules
+
+git submodule add -f git://github.com/CakeDC/search.git plugins/search
+git add -f plugins/search .gitmodules
+
+git submodule add -f git://github.com/CakeDC/migrations.git plugins/migrations
+git add -f plugins/migrations .gitmodules
+
+git submodule add -f git://github.com/slywalker/TwitterBootstrap.git plugins/TwitterBootstrap
+git add -g plugins/TwitterBootstrap .gitmodules
+
+
+# update
+# git fetch
+# git tag
+# git checkout -b <version>
+# git submodule update
+```
 
 
 
