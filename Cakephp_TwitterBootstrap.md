@@ -34,3 +34,21 @@ cd app
 ./Console/cake TwitterBootstrap.make
 ```
 
+## 使用方法
+
+> Controller/AppController.php
+
+```
+class AppController extends Controller
+{
+	public $helpers = array(
+		'Session',
+		'Html' => array('className' => 'TwitterBootstrap.BootstrapHtml'),
+		'Form' => array('className' => 'TwitterBootstrap.BootstrapForm'),
+		'Pagination' => array('className' => 'TwitterBootstrap.BootstrapPaginator'),
+	);
+}
+```
+
+
+
