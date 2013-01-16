@@ -138,5 +138,101 @@ public $presetVars = array(
 );
 ```
 
+## サンプルモジュール
 
+> AppController.php
 
+```
+    // paginate & search 用モジュール /////////////////////////////////////////////
+    public $limitKey = null;
+
+    /**
+     * 検索条件が指定されない場合の初期化処理。
+     * ソート順もここで処理する。
+     */
+    protected function initNamedParam($model, $defaults = array())
+    {
+        // $paginate のパラメータタイプによってデータ取得するパラメータを判断する
+        if (isset($this->paginate[$model]['paramType'])
+                && $this->paginate[$model]['paramType'] == 'querystring') {
+            $target =& $this->request->query;
+        } else {
+            $target =& $this->request->params['named'];
+        }
+
+        // 検索条件が変わった場合は1ページ目を表示する
+        if ($this->request->is('post')) {
+            unset($target['page']);
+        }
+
+        foreach ($defaults as $k => $v) {
+            // 初期化処理。request だけでなく passedArgs も処理しておく。
+            if (!isset($target[$k])) {
+                $target[$k] = $v;
+                $this->passedArgs[$k] = $v;
+            }
+
+            // ソート順の処理
+            if (is_string($this->limitKey) && $k == $this->limitKey) {
+                $this->paginate['Master']['limit'] = $target[$k];
+            }
+        }
+    }
+
+    /**
+     * 指定した検索データは Form 系なので、ビューで表示するために
+     * クエリデータをPOSTデータに入れる処理
+     */
+    protected function sameParamsToData($model, $keys = array())
+    {
+        // $paginate のパラメータタイプによってデータ取得するパラメータを判断する
+        if (isset($this->paginate[$model]['paramType'])
+                && $this->paginate[$model]['paramType'] == 'querystring') {
+            $target =& $this->request->query;
+        } else {
+            $target =& $this->request->params['named'];
+        }
+
+        foreach ($keys as $k => $v) {
+            $this->request->data['Master'][$k] = $target[$k];
+        }
+    }
+
+    protected function paginateForSearch($defaults, $model = null, $scope = array(), $whitelist = array())
+    {
+        $this->initNamedParam($model, $defaults);
+
+        $this->Prg->commonProcess($model);
+
+        $this->sameParamsToData($model, $defaults);
+
+        $conditions = $this->{$model}->parseCriteria($this->passedArgs);
+        $conditions = array_merge($conditions, $scope);
+
+        return parent::paginate($model, $conditions, $whitelist);
+    }
+
+    // paginate & search 用モジュール /////////////////////////////////////////////
+```
+
+> HogeController.php
+
+```
+    public function index()
+    {
+        $defaults = array(
+            's' => 0,               // 全学校
+            't' => 2,               // 未完了案件
+            'p' => 20,              // 20件
+            'sort' => 'mt_id',      // ID
+            'direction' => 'desc',  // 降順
+            'page' => 1,            // ページ
+        );
+        $this->limitKey = 'p'; 
+        $troubles = $this->paginateForSearch($defaults, 'Master');
+
+        $schools = $this->Customer->getCustomerList();
+
+        $this->set(compact('troubles', 'schools'));
+    }
+```
