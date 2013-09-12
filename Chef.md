@@ -5,30 +5,21 @@
 
 ## Windows
 
-- Ruby インストール[](http://rubyinstaller.org/)
-
-- Chef Solo インストール
-
-```
-gem install chef
-```
-
 - vagrant インストール  
 gem からインストールすると 1.0.x という古いバージョンになるので、
 サイトからWin版をインストールする。[Vagrant](http://www.vagrantup.com/)
 
--- vagrant にはRubyが同梱されているので、上記Rubyを参照しないように  
-PATHの順序を変える。vagrant が Rubyより先になるようにする。
+-- PATH を追加
 
 ```
-PATH=%vagrant%\bin;%RUBY%\bin
+PATH=%vagrant%\bin;...
 ```
 
 - 仮想サーバイメージ（BOX）のインストール[](http://www.vagrantbox.es/)  
 今回はCentOS 6.4 x64 をインストール
 
 ```
-vagrant box add base https://dl.dropbox.com/u/5721940/vagrant-boxes/vagrant-centos-6.4-x86_64-vmware_fusion.box
+vagrant box add base http://developer.nrel.gov/downloads/vagrant-boxes/CentOS-6.4-x86_64-v20130427.box
 ```
 
 - 設定ファイル作成 & 編集
@@ -40,7 +31,7 @@ vagrant init
 
 ``` Vagrantfile
 # 追加
-config.vm.box_url = "https://dl.dropbox.com/u/5721940/vagrant-boxes/vagrant-centos-6.4-x86_64-vmware_fusion.box"
+config.vm.box_url = "http://developer.nrel.gov/downloads/vagrant-boxes/CentOS-6.4-x86_64-v20130427.box"
 config.vm.network :private_network, ip: "192.168.50.12"
 ```
 
@@ -48,6 +39,13 @@ config.vm.network :private_network, ip: "192.168.50.12"
 
 ```
 vagrant plugin install sahara
+```
+
+- ssh (cygwinが使えれば)
+
+```
+vagrant ssh-config >> ~/.ssh/config
+vagrant ssh
 ```
 
 
