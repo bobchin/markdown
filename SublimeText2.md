@@ -51,6 +51,28 @@ Ctrl+Alt+o で表示
 - "AutoFileName"
 - "SublimeLinter"
 
+- japanize:日本語化
+
+```
+# インストール後
+cd ~/Library/Application Support/Sublime Text 2/Packages
+mv "Context.sublime-menu" "Context.sublime-menu.org"
+mv "Indentation.sublime-menu" "Indentation.sublime-menu.org"
+mv "Main.sublime-menu" "Main.sublime-menu.org"
+mv "Tab Context.sublime-menu" "Tab Context.sublime-menu.org"
+cp "../Japanize/Context.sublime-menu.jp" "./Context.sublime-menu"
+cp "../Japanize/Indentation.sublime-menu.jp" "./Indentation.sublime-menu"
+cp "../Japanize/Main.sublime-menu.jp" "./Main.sublime-menu"
+cp "../Japanize/Tab Context.sublime-menu.jp" "./Tab Context.sublime-menu"
+
+cp "../Japanize/Main.sublime-menu" ../User
+```
+
+- "IndentGuides"
+- "SublimeBlockCursor"
+- "DockBlockr"
+
+
 ## 参考
 
 - <http://dev.classmethod.jp/tool/html-corder-sublime-text-2-customize/>
