@@ -22,5 +22,12 @@ rpm --import http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-6
 rpm -ivh http://ftp.riken.jp/Linux/fedora/epel/6/i386/epel-release-6-8.noarch.rpm
 ```
 
+- remi
+
+- http://rpms.famillecollet.com/
+
+```
+rpm -ivh http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+```
 
 
