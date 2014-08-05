@@ -122,6 +122,7 @@ chkconfig ip6tables off
 # VirtualBox Guest Additionsのインストール
 mkdir /media/cdrom
 mount -r /dev/cdrom /media/cdrom
+# 開発ツールをインストールした後再起動しないとインストールに失敗する可能性あるので注意！
 sh /media/cdrom/VBoxLinuxAdditions.run
 umount /media/cdrom
 /etc/init.d/vboxadd setup
