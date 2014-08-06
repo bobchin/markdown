@@ -81,7 +81,7 @@ useradd vagrant
 passwd vagrant 		# パスワードを "vagrant" にする
 
 # ssh
-sudo - vagrant
+su - vagrant
 
 mkdir ~/.ssh
 chmod 700 ~/.ssh
@@ -95,7 +95,11 @@ visudo
 # ttyなしで実行可能に
 #Defaults requirety
 ...
+# PATHを引き継ぐ
+Defaults env_keey += "PATH"
+...
 # パスワード無しでsudoを実行可能に
+%whell ALL=(ALL) 	NOPASSWD:ALL
 vagrant ALL=(ALL) 	NOPASSWD:ALL
 
 # rpm
