@@ -134,7 +134,7 @@ Ctrl+Alt+o で表示
 - "IndentGuides"
 - "SublimeBlockCursor"
 - "DockBlockr"
-
+- "ExpandRegion"
 
 ## 参考
 
