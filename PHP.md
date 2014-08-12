@@ -2,27 +2,58 @@
 
 ## リスト
 
+- phpenv
 - 名前空間(5.3 <=)
 - 遅延静的束縛(5.3 <=)
 - SPL
 - Composer
 - Phar
-- コーディング規約(PSR-0)
+- コーディング規約(PSR-x)
 
-## コーディング規約
+### phpenv
 
-- http://www.infiniteloop.co.jp/blog/2012/10/psrphp/
-- http://www.slideshare.net/yandod/psrphp
-- http://9ensan.com/blog/programming/php/php-psr-coding-standards/
+- [](https://github.com/CHH/phpenv)
+- [](http://qiita.com/uchiko/items/5f1843d3d848de619fdf)
+
+- インストール
+
+```
+curl https://raw.githubusercontent.com/CHH/phpenv/master/bin/phpenv-install.sh | bash
+git clone git://github.com/CHH/php-build.git ~/.phpenv/plugins/php-build
+```
+
+- アップデート
+
+```
+UPDATE=yes phpenv-install.sh
+```
+
+- 設定
+
+```
+# .zshrc.local 
+# ※rbenvを利用しているのでrbenvの後に記述する？
+export PATH=$HOME/.phpenv/bin:$HOME/.phpenv/shims:$PATH
+source $HOME/.phpenv/completions/rbenv.zsh
+if [ -f phpenv ]; then
+	eval "$(phpenv init -)"
+fi
+```
+
+### コーディング規約
+
+- [](http://www.infiniteloop.co.jp/blog/2012/10/psrphp/)
+- [](http://www.slideshare.net/yandod/psrphp)
+- [](http://9ensan.com/blog/programming/php/php-psr-coding-standards/)
 
 
-## 名前空間
+### 名前空間
 
 ```
 namespace キーワード
 ```
 
-## Composer
+### Composer
 
 依存関係管理ツール。パッケージ管理ではない。
 ただし、PEARはOS単位だったのに比較してプロジェクト単位で扱えるようになっている。
@@ -53,7 +84,7 @@ php -r "readfile('https://getcomposer.org/installer');" | php
 ln -s composer.phar /usr/local/bin/composer
 ```
 
-### autoload
+#### autoload
 
 ダウンロードしたフォルダ(etc Venderなど)に "autoload.php" ができるので、
 自分のアプリ内でこれを require すればいい。
@@ -62,7 +93,7 @@ ln -s composer.phar /usr/local/bin/composer
 require 'vender/autoload.php';
 ```
 
-### composer.json
+#### composer.json
 
 ```
 {
@@ -93,7 +124,7 @@ require 'vender/autoload.php';
 }
 ```
 
-### 主な使い方
+#### 主な使い方
 
 
 
