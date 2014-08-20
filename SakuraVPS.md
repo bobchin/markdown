@@ -110,10 +110,19 @@ sudo /usr/local/sbin/checkintall --review-spec
 ## vim
 参照  
 - [http://qiita.com/items/604ebffb5cd4bcf4dccc](http://qiita.com/items/604ebffb5cd4bcf4dccc)  
-- [http://d.hatena.ne.jp/janus_wel/20110104/1294107609](http://d.hatena.ne.jp/janus_wel/20110104/1294107609)  
+- [http://d.hatena.ne.jp/janus_wel/20110104/1294107609](http://d.hatena.ne.jp/janus_wel/20110104/1294107609)
+
+- [](http://www.yuuan.net/item/821)  
 
 ```
-sudo yum install ncurses-devel (必要)  
+sudo yum install ncurses-devel lua lua-devel(必要)  
+
+# luajit
+git clone http://luajit.org/git/luajit-2.0.git ~/luajit
+make
+sudo make install
+
+# vim
 mkdir -p ~/vim  
 cd vim  
 wget ftp://ftp.vim.org/pub/vim/unix/vim-7.3.tar.bz2  
@@ -128,6 +137,7 @@ cd src
  --enable-multibyte  
  --disable-gui  
  --with-features=huge  
+ --enable-luainterp=yes  
 make ARCH=x86_64  
 sudo /usr/local/sbin/checkinstall  
 ```
