@@ -128,6 +128,7 @@ cd vim
 wget ftp://ftp.vim.org/pub/vim/unix/vim-7.3.tar.bz2  
 tar xvfj vim-7.3.tar.bz2  
 mkdir patches  
+cd patches  
 curl -O "ftp://ftp.vim.org/pub/vim/patches/7.3/7.3.[001-691]"  
 cd ../vim73  
 for i in `ls ../patches/7.3/*`; do patch -p0 < $i; done  
