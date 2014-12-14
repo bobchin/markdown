@@ -37,14 +37,23 @@
 # 仮定法現在
 
 + if 節の中
+
+```
  If it <u>be</u> fine tomorrow, they will go on an excursion.
  明日天気がよければ、彼らは遠足に行くだろう。
+```
 + that 節の中
+
+```
  They demand that the company pay them more.
  彼らは会社がもっと賃金を払うように要求した。
+```
 + 祈願文
+
+```
  God save the Queen!
  神が女王を救わんことを。（女王バンザイ！）
+```
       
       
       
