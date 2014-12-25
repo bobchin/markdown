@@ -67,9 +67,11 @@ Mac: *"~/Library/Application Support/Sublime Text 3/Packages/User"*
 
 ## テーマ
 
+- [TmTheme Editor](http://tmtheme-editor.herokuapp.com/)
+
 - [Theme - Flatland](https://github.com/thinkpixellab/flatland)
 - [Theme - Nexus](https://github.com/EleazarCrusader/nexus-theme)
-- [Theme - itg.flat]()
+- [Theme - itg.flat](https://github.com/itsthatguy/theme-itg-flat)
 
 ```js
 [Preferences.sublime-settings]
@@ -82,6 +84,7 @@ Mac: *"~/Library/Application Support/Sublime Text 3/Packages/User"*
 "color_scheme": "Packages/Theme - Nexus/Nexus.tmTheme",
 "theme": "Nexus.sublime-theme",
 
+// itg.flat
 "color_scheme": "Packages/Theme - itg.flat/itg.dark.tmTheme",
 "theme": "itg.flat.dark.sublime-theme",
 "itg_xsmall_tabs": true,
