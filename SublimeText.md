@@ -33,9 +33,18 @@
 import urllib.request,os,hashlib; h = '2deb499853c4371624f5a07e27c334aa' + 'bf8c4e67d14fb0525ba4f89698a6d7e1'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)
 ```
 
+
 ### パッケージのインストール
 
 コマンドパレット起動して、*Install Package* を選択する。
+
+### インストールしたパッケージのリスト
+
+*"Package Control.sublime-settings"* ファイル内の [installed_packages] セクションで取得できる。
+
+Win: "%APPDATA%\Sublime Text 3\Packages\User"
+Mac: "~/Library/Application Support/Sublime Text 3/Packages/User"
+
 
 ## テーマ
 
@@ -59,18 +68,25 @@ import urllib.request,os,hashlib; h = '2deb499853c4371624f5a07e27c334aa' + 'bf8c
 "itg_xsmall_tabs": true,
 ```
 
+
 ## 日本語関連
 
 - ConvertToUTF8
-- IMESupport
+- Codecs33(Macのみ)
+- IMESupport(Winのみ)
 - Japanize
 
 ```
-cd ~/Library/Application Support/Sublime Text 2/Packages/Default
+// Japanize
+// Win: %APPDATA%\Sublime Text 3\Packages\
+// Mac: ~/Library/Application Support/Sublime Text 3/Packages/
+
+cd *DIR*/Default
 mv "Context.sublime-menu" "Context.sublime-menu.org"
 mv "Indentation.sublime-menu" "Indentation.sublime-menu.org"
 mv "Main.sublime-menu" "Main.sublime-menu.org"
 mv "Tab Context.sublime-menu" "Tab Context.sublime-menu.org"
+
 cp "../Japanize/Context.sublime-menu.jp" "./Context.sublime-menu"
 cp "../Japanize/Indentation.sublime-menu.jp" "./Indentation.sublime-menu"
 cp "../Japanize/Main.sublime-menu.jp" "./Main.sublime-menu"
@@ -78,6 +94,7 @@ cp "../Japanize/Tab Context.sublime-menu.jp" "./Tab Context.sublime-menu"
 
 cp "../Japanize/Main.sublime-menu" ../User
 ```
+
 
 ## フォント
 
