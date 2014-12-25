@@ -9,27 +9,23 @@
 ## キー操作
 
 - コンソール起動
--- *[Ctrl + '']*
+> *[Ctrl + `]*
 - コマンドパレット起動
--- *Win: [Ctrl+Shift+P]*
--- *Mac: [Cmd+Shift+P]*
+> *Win: [Ctrl+Shift+P]*  
+> *Mac: [Cmd+Shift+P]*  
 
 
 ## パッケージ
 
 ### パッケージコントロール
 
-- https://sublime.wbond.net/
-
-#### インストール
-
 - [インストール](https://sublime.wbond.net/installation)
 
 "Ctrl+`" コンソール起動し、以下を貼り付け
 
-- SublimeText 3
-
 ```
+# SublimeText 3
+
 import urllib.request,os,hashlib; h = '2deb499853c4371624f5a07e27c334aa' + 'bf8c4e67d14fb0525ba4f89698a6d7e1'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)
 ```
 
@@ -40,10 +36,10 @@ import urllib.request,os,hashlib; h = '2deb499853c4371624f5a07e27c334aa' + 'bf8c
 
 ### インストールしたパッケージのリスト
 
-*"Package Control.sublime-settings"* ファイル内の [installed_packages] セクションで取得できる。
+**"Package Control.sublime-settings"** ファイル内の **[installed_packages]** セクションで取得できる。
 
-Win: "%APPDATA%\Sublime Text 3\Packages\User"
-Mac: "~/Library/Application Support/Sublime Text 3/Packages/User"
+Win: *"%APPDATA%\Sublime Text 3\Packages\User"*  
+Mac: *"~/Library/Application Support/Sublime Text 3/Packages/User"*  
 
 
 ## テーマ
@@ -52,7 +48,7 @@ Mac: "~/Library/Application Support/Sublime Text 3/Packages/User"
 - [Theme - Nexus](https://github.com/EleazarCrusader/nexus-theme)
 - [Theme - itg.flat]()
 
-```
+```js
 [Preferences.sublime-settings]
 
 // Flatland
@@ -60,8 +56,8 @@ Mac: "~/Library/Application Support/Sublime Text 3/Packages/User"
 "theme": "Flatland Dark.sublime-theme",
 
 // Nexus
-"color_scheme": "Packages/Theme - Nexus/Nexus.tmTheme
-"theme": "Nexus.sublime-theme"
+"color_scheme": "Packages/Theme - Nexus/Nexus.tmTheme",
+"theme": "Nexus.sublime-theme",
 
 "color_scheme": "Packages/Theme - itg.flat/itg.dark.tmTheme",
 "theme": "itg.flat.dark.sublime-theme",
@@ -81,7 +77,7 @@ Mac: "~/Library/Application Support/Sublime Text 3/Packages/User"
 // Win: %APPDATA%\Sublime Text 3\Packages\
 // Mac: ~/Library/Application Support/Sublime Text 3/Packages/
 
-cd *DIR*/Default
+cd %DIR%/Default
 mv "Context.sublime-menu" "Context.sublime-menu.org"
 mv "Indentation.sublime-menu" "Indentation.sublime-menu.org"
 mv "Main.sublime-menu" "Main.sublime-menu.org"
@@ -98,7 +94,7 @@ cp "../Japanize/Main.sublime-menu" ../User
 
 ## 設定
 
-```
+```js
 [Preferences.sublime-settings]
 
 // フォント
@@ -125,6 +121,7 @@ cp "../Japanize/Main.sublime-menu" ../User
 - [RecentActiveFiles](https://sublime.wbond.net/packages/RecentActiveFiles)
 - [SublimeGit](https://sublime.wbond.net/packages/SublimeGit)
 - [Git​Gutter](https://sublime.wbond.net/packages/GitGutter)
+- [OmniMarkupPreviewer](https://sublime.wbond.net/packages/OmniMarkupPreviewer)
 
 - LineEndings
 
@@ -146,8 +143,6 @@ https://github.com/titoBouzout/LineEndings
 - "HTML5": HTML5 用のスニペット
 - "Nettuts+ Fetch": 外部リソースをpullする
 コマンドパレット(Ctrl+Shift+P)から"Fetch"コマンド
-- "OmniMarkupPreviewer": MarkdownをHTML表示する
-Ctrl+Alt+o で表示
 - "SublimeServer"
 - "SublimeCodeIntel"
 - "AutoFileName"
