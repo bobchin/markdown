@@ -8,11 +8,34 @@
 
 ## キー操作
 
+- [キーボードショートカット](http://wakamsha.github.io/dev.cm/appendix/cheatsheet/sublimetext.html)
+
 - コンソール起動
 > *[Ctrl + `]*
+
 - コマンドパレット起動
 > *Win: [Ctrl+Shift+P]*  
 > *Mac: [Cmd+Shift+P]*  
+
+- ウィンドウ分割
+> *[Alt+Shift+1~4]* 縦分割  
+> *[Alt+Shift+5]*   ４分割  
+> *[Alt+Shift+8~9]* 横分割  
+
+- 単語選択
+> *[ctrl+D]* 同じ単語を選択  
+> *[ctrl+K]* 上記最中に単語をスキップ  
+
+- 行操作
+> *[ctrl+shift+↑]* 行ごと上に移動  
+> *[ctrl+shift+↓]* 行ごと下に移動  
+> *[ctrl+shift+D]*  行をコピー  
+> *[ctrl+shift+K]*  行を削除  
+
+- テキスト操作
+> *[ctrl+shift+enter]* 前に空行を挿入  
+> *[ctrl+enter]*       後ろに空行を挿入  
+
 
 
 ## パッケージ
@@ -72,7 +95,7 @@ Mac: *"~/Library/Application Support/Sublime Text 3/Packages/User"*
 - IMESupport(Winのみ)
 - Japanize
 
-```
+```shell
 // Japanize
 // Win: %APPDATA%\Sublime Text 3\Packages\
 // Mac: ~/Library/Application Support/Sublime Text 3/Packages/
@@ -103,6 +126,10 @@ cp "../Japanize/Main.sublime-menu" ../User
 
 // 1Click プレビュー 
 "preview_on_click": false,
+
+// ファイルエンコード・改行コード表示
+"show_encoding": true,
+"show_line_endings": true,
 ```
 
 
@@ -122,13 +149,8 @@ cp "../Japanize/Main.sublime-menu" ../User
 - [SublimeGit](https://sublime.wbond.net/packages/SublimeGit)
 - [Git​Gutter](https://sublime.wbond.net/packages/GitGutter)
 - [OmniMarkupPreviewer](https://sublime.wbond.net/packages/OmniMarkupPreviewer)
-
-- LineEndings
-
-```
-Add Repository
-https://github.com/titoBouzout/LineEndings
-```
+- [LineEndings](https://sublime.wbond.net/packages/LineEndings)
+- [Markdown Extended](https://sublime.wbond.net/packages/Markdown%20Extended)
 
 
 ## 設定
