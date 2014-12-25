@@ -70,6 +70,7 @@ Mac: *"~/Library/Application Support/Sublime Text 3/Packages/User"*
 - [TmTheme Editor](http://tmtheme-editor.herokuapp.com/)
 
 - [Theme - Flatland](https://github.com/thinkpixellab/flatland)
+- [Theme - predawn](https://github.com/jamiewilson/predawn)
 - [Theme - Nexus](https://github.com/EleazarCrusader/nexus-theme)
 - [Theme - itg.flat](https://github.com/itsthatguy/theme-itg-flat)
 
@@ -88,6 +89,12 @@ Mac: *"~/Library/Application Support/Sublime Text 3/Packages/User"*
 "color_scheme": "Packages/Theme - itg.flat/itg.dark.tmTheme",
 "theme": "itg.flat.dark.sublime-theme",
 "itg_xsmall_tabs": true,
+
+// predawn
+"theme": "predawn.sublime-theme"
+"tabs_small": true,
+"findreplace_small": true,
+"sidebar_medium": true,
 ```
 
 
@@ -125,7 +132,7 @@ cp "../Japanize/Main.sublime-menu" ../User
 
 // フォント
 "font_face": "Ricty",
-"font_size": 16,
+"font_size": 14,
 
 // 1Click プレビュー 
 "preview_on_click": false,
@@ -133,6 +140,13 @@ cp "../Japanize/Main.sublime-menu" ../User
 // ファイルエンコード・改行コード表示
 "show_encoding": true,
 "show_line_endings": true,
+
+// LineEndings
+"alert_when_line_ending_is":
+[
+	"Windows",
+	"CR"
+],
 ```
 
 
@@ -162,6 +176,7 @@ cp "../Japanize/Main.sublime-menu" ../User
 - [Preferences]-[基本設定]-[User]
 - [Sublime Text 2 の設定をいじる](http://blue-ham-cake1024.hatenablog.com/entry/2012/09/07/Sublime_Text_2_%E3%81%AE%E8%A8%AD%E5%AE%9A%E3%82%92%E3%81%84%E3%81%98%E3%82%8B)
 
+
 ### インストール一覧
 
 - "Git": コマンドパレット(Ctrl+Shift+P)からGitコマンドが使用できる
@@ -176,6 +191,7 @@ cp "../Japanize/Main.sublime-menu" ../User
 - "SublimeBlockCursor"
 - "DockBlockr"
 - "ExpandRegion"
+
 
 ## 参考
 
