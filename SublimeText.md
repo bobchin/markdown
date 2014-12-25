@@ -96,41 +96,35 @@ cp "../Japanize/Main.sublime-menu" ../User
 ```
 
 
-## フォント
+## 設定
 
 ```
 [Preferences.sublime-settings]
+
+// フォント
 "font_face": "Ricty",
 "font_size": 16,
-```
 
-## 1 Click プレビュー
-
-```
+// 1Click プレビュー 
 "preview_on_click": false,
 ```
 
+
 ## インストールパッケージ
-- SideBarEnhancements
 
-SublimeText3のみ対応のため古いソースをいれる
-
-```
-[コンソールから]
-import os; path=sublime.packages_path(); (os.makedirs(path) if not os.path.exists(path) else None); window.run_command('exec', {'cmd': ['git', 'clone', 'https://github.com/titoBouzout/SideBarEnhancements', 'SideBarEnhancements'], 'working_dir': path})
-
-import os; path=sublime.packages_path(); window.run_command('exec', {'cmd': ['git', 'checkout', '37429739a0452a2dc36343fb7875ba7fcbeb88a9'], 'working_dir': os.path.join(path, 'SideBarEnhancements')})
-```
-
-自動的にアップデートしないように
-
-```
-[Package Control.sublime-settings User]
-"auto_upgrade_ignore":
-[
-	"SideBarEnhancements"
-]
-```
+- [SideBarEnhancements](https://sublime.wbond.net/packages/SideBarEnhancements)
+- [BracketHighlighter](https://sublime.wbond.net/packages/BracketHighlighter)
+- [Alignment](https://sublime.wbond.net/packages/Alignment)
+- [EditorConfig](https://sublime.wbond.net/packages/EditorConfig)
+- [Smart Delete](https://sublime.wbond.net/packages/Smart%20Delete)
+- [Terminal](https://sublime.wbond.net/packages/Terminal)
+- [Sublime Files](https://sublime.wbond.net/packages/Sublime%20Files)
+- [Emmet](https://sublime.wbond.net/packages/Emmet)
+- [DataConverter](https://sublime.wbond.net/packages/DataConverter)
+- [FindKeyConflicts](https://sublime.wbond.net/packages/FindKeyConflicts)
+- [RecentActiveFiles](https://sublime.wbond.net/packages/RecentActiveFiles)
+- [SublimeGit](https://sublime.wbond.net/packages/SublimeGit)
+- [Git​Gutter](https://sublime.wbond.net/packages/GitGutter)
 
 - LineEndings
 
@@ -138,19 +132,6 @@ import os; path=sublime.packages_path(); window.run_command('exec', {'cmd': ['gi
 Add Repository
 https://github.com/titoBouzout/LineEndings
 ```
-
-- Trailing Spaces
-
-```
-[Default.sublime-keymap]
-{ "keys": ["ctrl+shift+d"], "command": "delete_trailing_spaces" },
-{ "keys": ["ctrl+shift+t"], "command": "toggle_trailing_spaces" }
-```
-
-- Quick File Open
-- GotoRecent|RecentActiveFiles
-- AdvancedNewFile
-- Terminal
 
 
 ## 設定
@@ -161,20 +142,13 @@ https://github.com/titoBouzout/LineEndings
 
 ### インストール一覧
 
-- "ConvertToUTF8": ShiftJIS に対応する
 - "Git": コマンドパレット(Ctrl+Shift+P)からGitコマンドが使用できる
 - "HTML5": HTML5 用のスニペット
-- "IMESupport": インライン変換の表示位置補正（Windows用）
 - "Nettuts+ Fetch": 外部リソースをpullする
 コマンドパレット(Ctrl+Shift+P)から"Fetch"コマンド
 - "OmniMarkupPreviewer": MarkdownをHTML表示する
 Ctrl+Alt+o で表示
-- "Package Control"
-- "Theme - Soda": テーマ
-- "ZenCoding":
 - "SublimeServer"
-- "Terminal"
-- "Alignment"
 - "SublimeCodeIntel"
 - "AutoFileName"
 - "SublimeLinter"
