@@ -1,4 +1,4 @@
-# SublimeText2
+# SublimeText
 
 ## インストール
 
@@ -6,17 +6,57 @@
 - [パッケージコントロール](http://wbond.net/sublime_packages/package_control)
 - [インストール方法](http://wbond.net/sublime_packages/package_control/installation)
 
+## キー操作
+
+- コンソール起動
+-- *[Ctrl + '']*
+- コマンドパレット起動
+-- *Win: [Ctrl+Shift+P]*
+-- *Mac: [Cmd+Shift+P]*
+
+
 ## パッケージ
 
 ### パッケージコントロール
 
 - https://sublime.wbond.net/
 
-```
-"Ctrl+`" コンソール起動
-以下を貼り付け
+#### インストール
 
-import urllib2,os; pf='Package Control.sublime-package'; ipp=sublime.installed_packages_path(); os.makedirs(ipp) if not os.path.exists(ipp) else None; urllib2.install_opener(urllib2.build_opener(urllib2.ProxyHandler())); open(os.path.join(ipp,pf),'wb').write(urllib2.urlopen('http://sublime.wbond.net/'+pf.replace(' ','%20')).read()); print 'Please restart Sublime Text to finish installation'
+- [インストール](https://sublime.wbond.net/installation)
+
+"Ctrl+`" コンソール起動し、以下を貼り付け
+
+- SublimeText 3
+
+```
+import urllib.request,os,hashlib; h = '2deb499853c4371624f5a07e27c334aa' + 'bf8c4e67d14fb0525ba4f89698a6d7e1'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)
+```
+
+### パッケージのインストール
+
+コマンドパレット起動して、*Install Package* を選択する。
+
+## テーマ
+
+- [Theme - Flatland](https://github.com/thinkpixellab/flatland)
+- [Theme - Nexus](https://github.com/EleazarCrusader/nexus-theme)
+- [Theme - itg.flat]()
+
+```
+[Preferences.sublime-settings]
+
+// Flatland
+"color_scheme": "Packages/Theme - Flatland/Flatland Dark.tmTheme",
+"theme": "Flatland Dark.sublime-theme",
+
+// Nexus
+"color_scheme": "Packages/Theme - Nexus/Nexus.tmTheme
+"theme": "Nexus.sublime-theme"
+
+"color_scheme": "Packages/Theme - itg.flat/itg.dark.tmTheme",
+"theme": "itg.flat.dark.sublime-theme",
+"itg_xsmall_tabs": true,
 ```
 
 ## 日本語関連
@@ -54,16 +94,6 @@ cp "../Japanize/Main.sublime-menu" ../User
 ```
 
 ## インストールパッケージ
-
-- itg.flat
-
-```
-[Preferences.sublime-settings]
-"color_scheme": "Packages/Theme - itg.flat/itg.dark.tmTheme",
-"theme": "itg.flat.dark.sublime-theme",
-"itg_xsmall_tabs": true,
-```
-
 - SideBarEnhancements
 
 SublimeText3のみ対応のため古いソースをいれる
