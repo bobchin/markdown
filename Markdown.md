@@ -1,4 +1,4 @@
-#Markdownの学習
+# Markdownの学習
 
 ## コードの挿入
 `print 'hoge!';`
@@ -55,8 +55,16 @@ _イタリック_
 ---
 
 
+#  別形式にする
 
+- [Pandoc](http://johnmacfarlane.net/pandoc)
 
+## 実行
+
+```shell
+// pandoc xxx.md -t [type] -o [output fileneme]
+pandoc markdown.md -t docx -o markdown.docx
+```
 
 
 
