@@ -30,4 +30,18 @@ rpm -ivh http://ftp.riken.jp/Linux/fedora/epel/6/i386/epel-release-6-8.noarch.rp
 rpm -ivh http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
 ```
 
+## firewalld
 
+```
+#有効/無効化
+systemctl enable firewalld
+systemctl disable firewalld
+
+#ゾーンの確認
+firewall-cmd --list-all
+
+firewall-cmd --get-services   #定義済みサービスの一覧
+firewall-cmd --list-service   #publicゾーンのサービス一覧
+firewall-cmd --add-service=http --permanent #publicゾーンにhttpサービスを追加
+firewall-cmd --remove-service=http #publicゾーンにhttpサービスを追加
+```
