@@ -31,7 +31,7 @@ UPDATE=yes phpenv-install.sh
 - 設定
 
 ```
-# .zshrc.local 
+# .zshrc.local
 # ※rbenvを利用しているのでrbenvの後に記述する？
 export PATH=$HOME/.phpenv/bin:$HOME/.phpenv/shims:$PATH
 source $HOME/.phpenv/completions/rbenv.zsh
@@ -70,7 +70,6 @@ monolog/monolog パッケージの1.2で始まるバージョン
 
 - インストール
 
-
 要は"https://getcomposer.org/installer" を実行すればいい。
 "composer.phar" が作成される。
 "composer.phar" は実行可能ファイルなので
@@ -82,6 +81,12 @@ curl -sS https://getcomposer.org/installer | php
 php -r "readfile('https://getcomposer.org/installer');" | php
 
 ln -s composer.phar /usr/local/bin/composer
+```
+
+- アップデート
+
+```
+composer self-update
 ```
 
 #### autoload
@@ -125,8 +130,3 @@ require 'vender/autoload.php';
 ```
 
 #### 主な使い方
-
-
-
-
-
