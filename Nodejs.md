@@ -5,7 +5,7 @@
 インストール
 
 ```
-cd 
+cd
 git clone git://github.com/creationix/nvm.git
 ```
 
@@ -32,7 +32,52 @@ nvm alias default v0.9.3	# デフォルトのバージョンを設定
 npm install -g less jshint recess uglify-js
 ```
 
-## nvmw(Node Version Manager for Windows)
+## nodist
+
+Windows 専用の node.js バージョン管理ツール
+nvmwよりいいらしいのでこちらを使う。
+
+- [nodist](https://github.com/marcelklehr/nodist)
+
+インストール
+
+```
+git clone git://github.com/marcelklehr/nodist.git "D:\data\nodist"
+```
+
+PATH追加
+
+```
+NODIST_PREFIX=D:\data\nodist
+PATH=%NODIST_PREFIX%\bin;%PATH%
+# node の REPL でモジュールをグローバルで見えるようにする場合追加
+NODE_PATH=%NODIST_PREFIX%\bin\node_modules;%NODE_PATH%
+# node の 64bit バージョンを使用する場合
+NODIST_X64=1
+```
+
+操作
+
+```
+nodist selfupdate
+
+# インストール可能なバージョンのリスト
+nodist dist
+
+# インストール
+nodist - v0.12.0
+
+# 削除
+nodist - v0.8.0
+
+# globalにする
+nodist v0.12.0
+```
+
+
+### nvmw(Node Version Manager for Windows)
+
+※duplicated!
 
 - https://github.com/hakobera/nvmw
 
@@ -169,9 +214,3 @@ var hello = require("hello.js");
 console.log(hello.Name);
 hello.hello("World");
 ```
-
-
-
-
-
-
