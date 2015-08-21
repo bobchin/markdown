@@ -4,11 +4,11 @@
 
 - 梅沢無線
 
-※2012.12現在の最新バージョンは、*Arudino Uno Rev3*
+※2012.12現在の最新バージョンは、*Arduino Uno Rev3*
 
 ** 環境
 
-- <http://arduino.cc/en/Main/Software>
+- [http://arduino.cc/en/Main/Software](http://arduino.cc/en/Main/Software)
 
 ** メモ
 
