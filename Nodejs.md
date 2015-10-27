@@ -65,7 +65,7 @@ nodist selfupdate
 nodist dist
 
 # インストール
-nodist - v0.12.0
+nodist + v0.12.0
 
 # 削除
 nodist - v0.8.0
