@@ -1,5 +1,110 @@
 # Vim のキーマッピングメモ
 
+## インストール
+
+- Gitからでインストールできる
+
+```
+cd ~
+git clone https://github.com/vim/vim.git vim_git
+cd vim_git
+
+# アップデートする場合
+git pull
+
+cd src
+make distclean
+make
+sudo make install
+```
+
+- コンパイルオプション
+
+```
+cd ~
+cd vim_git/src
+./configure \
+  --with-features=huge \
+  --enable-multibyte \
+  --enable-luainterp=yes \
+  --enable-perlinterp=yes \
+  --enable-pythoninterp=yes \
+  --enable-rubyinterp=yes \
+  --enable-fail-if-missing
+make
+make install
+```
+
+## プラグイン
+
+- NeoBundle
+
+何はなくてもまず (NeoBundle)[https://github.com/Shougo/neobundle.vim]
+.vimrc に以下を記述する
+
+```
+if has('vim_starting')
+  if &compatible
+    " vi との互換性をもたない
+    set nocompatible
+  endif
+
+  set rtp+=~/.vim/bundle/neobundle.vim/
+endif
+
+let vundle_readme=expand('~/.vim/bundle/neobundle.vim/README.md')
+if !filereadable(vundle_readme)
+  echo "Installing NeoBundle..."
+  echo ""
+  silent !mkdir -p ~/.vim/bundle
+  silent !git clone https://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim/
+endif
+
+call neobundle#begin(expand('~/.vim/bundle/'))
+
+" NeoBundle 自体を NeoBundle で管理する
+NeoBundleFetch 'Shougo/neobundle.vim'
+
+" ここにインストールするプラグインを記述する
+" 通常はgithubのリポジトリと判断する
+" ex) NeoBundle 'Shougo/neobundle.vim'
+" urlの場合はそのままダウンロードされる？
+" ex) NeoBundle 'https://github.com/Shougo/neobundle.vim'
+" vim-scripts(http://vim-scripts.org/vim/scripts.html)から取得する場合
+" ex) NeoBundle "taglist.vim"
+
+NeoBundle 'Shougo/vimproc', {
+    \ 'build' : {
+    \     'cygwin' : 'make -f make_cygwin.mak',
+    \     'mac'    : 'make',
+    \     'linux'  : 'make',
+    \     'unix'   : 'gmake',
+    \     },
+    \ }
+
+call neobundle#end()
+filetype plugin indent on
+NeoBundleCheck
+```
+
+  - 操作
+    - :NeoBundleInstall   プラグインをインストールする
+    - :NeoBundleClean     記述されていないプラグインを削除する
+
+  - vimproc
+    インストール時に非同期で実行できるので速度が早くなる
+
+
+## 内容確認
+
+- オプション
+
+```
+set             " 既定値ではないオプションの内容一覧
+set all         " 全オプションの内容一覧
+set <option>?   "
+```
+
 ## マニュアル
 
 - キーバインド
@@ -102,6 +207,53 @@
 
 - :map 現在のマップを確認
 
+- マップ一覧
+  - :map    = ノーマル・ビジュアル・オペレータ待機
+  - :vmap   = ビジュアル
+  - :nmap   = ノーマル
+  - :omap   = オペレータ待機
+  - :map!   = 挿入・コマンドライン
+  - :imap   = 挿入
+  - :cmap   = コマンドライン
+
+- 再マップ
+
+**no** が付かないmapの場合、マッピングしたキーは再帰的に展開される
+もうそれ以上内容を展開したくない場合はnoremap系を使う
+
+- 特殊文字
+- <Bar>   = "|"
+- <Space> = " "
+
+:map コマンドの後ろには他のコマンドを続けてかくことができる。
+その場合に "|" 文字で区切る
+
+- キーワード
+  - \<script\>  = スクリプトローカルなマップ
+  - \<buffer\>  = バッファローカルなマップ
+  - \<unique\>  = 2重定義時にコマンドが失敗する。上書き定義を避ける。
+  - \<Nop\>     = 何もしない
+  - \<SID\>     = 実行時に"<SID>"の部分がスクリプトIDに変わる
+  - \<Plug\>    = キーボードからは入力できない。外部から影響を受けずにスクリプト内部で使用するのに使う
+
+
+## 自動コマンド
+
+  ```
+  " [group]: 省略可
+  " {events}： 実行するタイミング=イベント
+  " {file_pattern}： 対象とするファイル名。ワイルドカード指定可
+  " [nested]： 省略可
+  " {command}：実行するコマンド
+  :autocmd [group] {events} {file_pattern} [nested] {command}
+
+  " 削除 {command}は指定しない
+  :autocmd {events} {file_pattern}
+  ```
+
+    - イベント
+      - |autocmd-events| を参照
+
 
 ## ウィンドウ
 
@@ -162,7 +314,242 @@
 - foldcolumn : 左側に表示される折りたたみ用のカラム幅
 
 
+## スクリプト書法
 
+- 変数
+  - s:xxx   = スクリプトローカル変数：スクリプトファイル内のみ有効
+  - b:xxx   = バッファローカル変数
+  - w:xxx   = ウィンドウローカル変数
+  - g:xxx   = グローバル変数
+  - v:xxx   = vimが定義する変数
+
+定義は **let** を使う
+
+- 文字列
+
+"" もしくは '' で囲む。
+**""** 内は特殊文字（\+x）が展開される
+
+- 式
+
+  - 実行
+    - execute   : コロンで指定できるコマンドのみ実行可能
+    - eval      : 実行結果を取得したい
+
+```
+" コマンドは文字列で指定する
+execute "tag " . tag_name
+
+let optname
+let optval = eval('&' . optname)
+```
+
+以下が使用できる
+
+  - 数値
+  - 文字列
+  - 変数
+    - $xxx  ：環境変数
+    - &xxx  ：オプション
+    - @x    ：レジスタ
+
+  - 数値計算
+    - a + b
+    - a - b
+    - a * b
+    - a / b
+    - a % b
+
+  - 条件式
+    - if
+
+```
+if {condition}
+  {statement}
+elseif {condition}
+  {statement}
+else
+{statement}
+endif
+```
+
+  - 論理演算
+    - a == b
+    - a != b
+    - a > b
+    - a >= b
+    - a < b
+    - a <= b
+    - a =~ b  : パターンマッチ。文字列aがパターンbにマッチするか？ **(文字列のみ)**
+    - a !~ b  : パターンマッチしないか。
+
+  - 繰り返し
+    - while
+    - for
+    - continue
+    - break
+
+```
+while counter < 40
+  call do_something()
+  if skip_flag
+    continue
+  endif
+  if finished_flag
+    break
+  endif
+  sleep 50m
+endwhile
+
+for {varname} in {list}
+  {command}
+endfor
+
+for a in range(8, 4, -2)
+  echo a
+endfor
+" 8
+" 6
+" 4
+```
+
+  - 関数
+    - rangeキーワード
+      - a:firstline : 暗黙の変数
+      - a:lastline  : 暗黙の変数
+    - 可変長引数
+      - a:0         : オプション引数の数
+      - a:1~a:20    : オプション引数
+
+```
+" 関数名は大文字
+" function! は関数の再定義
+function {name}({var1}, {var2}, ...) [range]
+  {body}
+endfunction
+
+function Min(num1, num2)
+  if a:num1 < a:num2
+    let smaller = a:num1
+  else
+    let smaller = a:num2
+  endif
+  return smaller
+endfunction
+```
+
+  - リストと辞書
+
+```
+" リスト
+let alist = ['foo', 'bar', 'baz']
+for n in alist
+  echo n
+endfor
+" foo
+" bar
+" baz
+
+" 辞書
+let uk2nl = {'one': 'een', 'two': 'twee', 'three': 'drie'}
+echo uk2nl['two']
+echo uk2nl.two
+" twee
+" twee
+for key in keys(uk2nl)
+  echo key
+endfor
+" three
+" one
+" two
+```
+
+## 設定
+
+set autoindent      : 改行したときにインデントを前の行に合わせる
+set smartindent     : 少し賢く自動インデントする
+set shiftwidth=4    : インデントに使用する空白文字の数
+set tabstop=4       : tab文字を表示するときに使用する空白文字の数
+set softtabstop=0   : 編集でtab文字の幅として使用する空白文字の数（0で無効にする）
+set expandtab       : 挿入モード時にtab文字を使用しないで空白文字を使用する
+
+
+## 日本語固定入力モード
+
+- (Vim/GVimで「日本語入力固定モード」を使用する)[https://sites.google.com/site/fudist/Home/vim-nihongo-ban/vim-japanese/ime-control]
+
+### Windowsの環境
+
+(AutoHotKey)[http://ahkscript.org]を使う。
+PuTTY+Vimの場合にウィンドウとVimのモードを取得する必要がある。
+Vimの設定でウィンドウタイトルを使用する。
+
+- 参考
+  - (AutoHotKey Wiki)[http://ahkwiki.net/Top]
+  - (AutoHotkeyJp)[https://sites.google.com/site/autohotkeyjp/]
+
+- vimの設定
+
+```
+# ウィンドウタイトルを変更する。通常時は"vim - normal"。挿入モード時は"vim - insert"
+set title titlestring=vim\ -\ normal
+augroup EnterInsertMode
+    autocmd!
+    autocmd InsertEnter * set title titlestring=vim\ -\ insert
+    autocmd InsertLeave * set title titlestring=vim\ -\ normal
+augroup END
+```
+
+- AutoHotKeyの設定
+  - (IME制御用 関数群)[http://www6.atwiki.jp/eamat/pages/17.html]が必要
+
+```
+; vim.ahk
+;
+
+GroupAdd Terminal, ahk_class PuTTY
+;GroupAdd Terminal, ahk_class mintty
+
+; IME.ahk は　"C:\Users\%USERPROFILE%\Documents\AutoHotkey\Lib"
+; に入れておくとIncludeしなくてよい
+;#Include %A_ScriptDir%\IME.ahk
+;Return
+
+; 日本語固定入力モードの状態（0:無効 1:固定入力モード）
+JapaneseFixMode=0
+
+SetTitleMatchMode 2
+#IfWInActive vim - insert ahk_group Terminal
+^j::
+  JapaneseFixMode:=!JapaneseFixMode
+  Return
+
+Esc::
+  Send {Esc}
+  IME_SET(0)
+  Return
+
+^[::
+  Send ^[
+  IME_SET(0)
+  Return
+
+#IfWInActive vim - normal ahk_group Terminal
+i::
+  Send i
+  if (JapaneseFixMode) {
+    IME_SET(1)
+  }
+  Return
+
+a::
+  Send a
+  if (JapaneseFixMode) {
+    IME_SET(1)
+  }
+  Return
+#IfWInActive
+```
 
 
 ## ノーマルモード
