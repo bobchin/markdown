@@ -108,6 +108,25 @@ augroup CloseHelpWithQ
     autocmd!
     autocmd FileType help nnoremap <buffer>q <C-w>c
 augroup END
+
+" "K" でヘルプを開く
+set keywordprg=:help
+
+nnoremap <Space>t :<C-u>tab help<Space>
+nnoremap <Space>v :<C-u>vertical belowright help<Space>
+nnoremap <silent> tm :<C-u>call <SID>MoveToNewTab()<CR>
+function! s:MoveToNewTab()
+    tab split
+    tabprevious
+
+    if winnr('$') > 1
+      close
+    elseif bufnr('$') > 1
+      buffer #
+    endif
+
+    tabnext
+endfunction
 ```
 
 
@@ -300,6 +319,9 @@ xmap <C-k> <Plug>(neosnippet_expand_target)
 - vimshel で補完
 - Vim 補完
 
+<C-y>: 補完確定
+<C-e>: キャンセル
+
 ```
 NeoBundleLazy 'Shougo/neocomplete.vim', {
   \ 'depends': 'Shougo/context_filetype.vim',
@@ -346,9 +368,9 @@ inoremap <expr><C-l> neocomplete#complete_common_string()
 " <CR>: ポップアップを閉じてインデントを保存
 inoremap <silent><CR> <C-r>=<SID>my_cr_function()<CR>
 function! s:my_cr_function()
-  return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
+  "return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
   " For no inserting <CR> key.
-  "return pumvisible() ? "\<C-y>" : "\<CR>"
+  return pumvisible() ? "\<C-y>" : "\<CR>"
 endfunction
 
 " <TAB>: 補完実行
