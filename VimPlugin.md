@@ -51,12 +51,19 @@ filetype plugin indent on
 NeoBundleCheck
 ```
 
-  - 操作
-    - :NeoBundleInstall   プラグインをインストールする
-    - :NeoBundleClean     記述されていないプラグインを削除する
+- 操作
+  - :NeoBundleInstall   プラグインをインストールする
+  - :NeoBundleClean     記述されていないプラグインを削除する
 
-  - vimproc
-    インストール時に非同期で実行できるので速度が早くなる
+- vimproc
+  - インストール時に非同期で実行できるので速度が早くなる
+
+- 設定の仕方
+  - http://d.hatena.ne.jp/osyo-manga/20130211/1360582966
+  1. :NeoBundle でプラグインの読み込み
+  1. プラグインの初期化処理
+  1. プラグインの機能を呼び出す設定（マッピングなど）
+
 
 
 ## unite
@@ -64,13 +71,7 @@ NeoBundleCheck
 検索して表示するという一連の動作を管理するプラットフォーム。
 
 ```
-NeoBundleLazy 'Shougo/unite.vim', {
-  \ 'depends' : 'Shougo/neomru.vim',
-  \ 'commands' : [{
-  \     'name' : ['unite'],
-  \     'complete' : 'customlist,unite#complete_source',
-  \   }],
-  \ }
+NeoBundleLazy 'Shougo/unite.vim'
 NeoBundleLazy 'thinca/vim-unite-history'
 NeoBundleLazy 'Shougo/unite-help'
 NeoBundleLazy 'tsukkee/unite-tag'
@@ -80,14 +81,95 @@ NeoBundle 'h1mesuke/vim-alignta'
 ```
 
 ```
+if neobundle#tap('unite.vim')
+  call neobundle#config({
+    \ 'depends' : 'Shougo/neomru.vim',
+    \ 'commands' : [{
+    \     'name' : ['unite'],
+    \     'complete' : 'customlist,unite#complete_source',
+    \   }],
+    \ })
+  
+  function! neobundle#hooks.on_source(bundle)
+    call unite#custom#profile('default', 'context', {
+      \   'auto_select': 0,
+      \   'start_insert': 0,
+      \ })
+  endfunction
+  
+  call neobundle#untap()
+endif
+
 nnoremap [unite] <Nop>
 nmap f [unite]
+
+" カレントディレクトリ表示（vimfilerに移行）
+"nnoremap <silent> [unite]f :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+
+" バッファ一覧
 nnoremap <silent> [unite]b :<C-u>Unite buffer<CR>
-nnoremap <silent> [unite]u :<C-u>Unite buffer file_mru<CR>
+
+" レジスタ一覧
+nnoremap <silent> [unite]r :<C-u>Unite -buffer-name=register register<CR>
+
+" 最近使用したファイル一覧
+nnoremap <silent> [unite]m :<C-u>Unite file_mru buffer<CR>
+
+" ブックマーク一覧
+nnoremap <silent> [unite]c :<C-u>Unite bookmark<CR>
+
+" ブックマークに追加
+nnoremap <silent> [unite]a :<C-u>UniteBookmarkAdd<CR>
+
+" align
 nnoremap <silent> [unite]l :<C-u>Unite alignta<CR>
-nnoremap <silent> [unite]a :<C-u>UniteWithBufferDir -buffer-name=files buffer file_mru bookmark file <CR>
+
+" help
 nnoremap <C-i> :<C-u>Unite -start-insert help<CR>
 nnoremap <C-i><C-i> :<C-u>UniteWithCursorWord help<CR>
+```
+
+
+## vimfiler
+
+ファイラー
+
+- 操作方法（ノーマルモード。詳しくはヘルプのマッピングを参照）
+  - g?      ヘルプ
+  - 移動は通常のノーマルモードと同じ
+    - h     上のディレクトリ
+    - l     下のディレクトリ
+  - <Space> マーク
+  - c       コピー
+  - m       移動
+  - d       削除
+  - r       名前変更
+  - Cc      クリップボードコピー
+  - Cm      クリップボード移動
+  - Cd      クリップボード削除
+  - <Enter> 移動または編集
+  - t       ツリーを開く
+  - q       閉じる
+  - Q       終了する
+
+```
+NeoBundleLazy 'Shougo/vimfiler.vim', {
+ \ 'depends' : 'Shougo/unite.vim',
+ \ 'mappings' : '<Plug>',
+ \ 'explorer' : '^\h\w*:',
+ \ }
+```
+
+```
+" vimfiler をデフォルトのファイラーにする
+let g:vimfiler_as_default_explorer = 1
+
+nnoremap <silent> ff :<C-u>VimFilerBufferDir -quit<CR>
+nnoremap <silent> fi :<C-u>:VimFilerBufferDir -buffer-name=explorer -split -simple -winwidth=35 -no-quit<CR>
+
+call unite#custom#profile('default', 'context', {
+  \   'safe': 0,
+  \ })
 ```
 
 
@@ -391,4 +473,20 @@ autocmd FileType xml           setlocal omnifunc=xmlcomplete#CompleteTags
 if !exists('g:neocomplete#sources#omni#input_patterns')
   let g:neocomplete#sources#omni#input#patterns = {}
 endif
+```
+
+## vimshell
+
+```
+NeoBundleLazy 'Shougo/vimshell.vim', {
+ \ 'mappings' : '<Plug>',
+ \ 'commands' : [{
+ \     'name' : ['VimShell'],
+ \     'complete' : 'customlist,vimshell#complete',
+ \   }],
+ \ }
+```
+
+```
+nnoremap <Leader>sh :<C-u>VimShell<CR>
 ```
