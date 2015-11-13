@@ -64,6 +64,35 @@ NeoBundleCheck
   1. プラグインの初期化処理
   1. プラグインの機能を呼び出す設定（マッピングなど）
 
+```
+" sample
+
+NeoBundleLazy 'foo/bar.vim'
+
+:
+:
+:
+
+if neobundle#tap('unite.vim')
+  call neobundle#config({
+    \ 'depends': ['foo', 'bar'],
+    \ 'commands' : [{
+    \     'name' : ['xxx'],
+    \     'complete' : 'customlist,unite#complete_source',
+    \   }],
+    \ 'mappings': '<Plug>',
+    \ 'insert': 1,
+    \ })
+
+    function! neobundle#hooks.on_source(bundle)
+      " ここに読み込んだ後に設定するものを記述
+    endfunction
+    
+    call neobundle#untap()
+endif
+
+nnoremap <xxx> <yyy>
+```
 
 
 ## unite
@@ -123,10 +152,6 @@ nnoremap <silent> [unite]a :<C-u>UniteBookmarkAdd<CR>
 
 " align
 nnoremap <silent> [unite]l :<C-u>Unite alignta<CR>
-
-" help
-nnoremap <C-i> :<C-u>Unite -start-insert help<CR>
-nnoremap <C-i><C-i> :<C-u>UniteWithCursorWord help<CR>
 ```
 
 
@@ -153,23 +178,31 @@ nnoremap <C-i><C-i> :<C-u>UniteWithCursorWord help<CR>
   - Q       終了する
 
 ```
-NeoBundleLazy 'Shougo/vimfiler.vim', {
- \ 'depends' : 'Shougo/unite.vim',
- \ 'mappings' : '<Plug>',
- \ 'explorer' : '^\h\w*:',
- \ }
+NeoBundleLazy 'Shougo/vimfiler.vim'
 ```
 
 ```
+if neobundle#tap('vimfiler.vim')
+  call neobundle#config({
+    \ 'depends' : 'Shougo/unite.vim',
+    \ 'mappings' : '<Plug>',
+    \ 'explorer' : '^\h\w*:',
+    \ })
+  
+  function! neobundle#hooks.on_source(bundle)
+    call unite#custom#profile('default', 'context', {
+      \   'safe': 0,
+      \ })
+  endfunction
+  
+  call neobundle#untap()
+endif
+
 " vimfiler をデフォルトのファイラーにする
 let g:vimfiler_as_default_explorer = 1
 
 nnoremap <silent> ff :<C-u>VimFilerBufferDir -quit<CR>
 nnoremap <silent> fi :<C-u>:VimFilerBufferDir -buffer-name=explorer -split -simple -winwidth=35 -no-quit<CR>
-
-call unite#custom#profile('default', 'context', {
-  \   'safe': 0,
-  \ })
 ```
 
 
@@ -178,18 +211,27 @@ call unite#custom#profile('default', 'context', {
 ヘルプ関連
 
 ```
-NeoBundleLazy 'vim-jp/vimdoc-ja', {
- \ 'filetypes' : 'help',
- \ }
+NeoBundleLazy 'vim-jp/vimdoc-ja'
 ```
 
 ```
-set helplang=ja
-" "q" でヘルプウィンドウが閉じられるようにする
-augroup CloseHelpWithQ
-    autocmd!
+if neobundle#tap('vimdoc-ja')
+  call neobundle#config({
+    \ 'filetypes' : 'help',
+    \ })
+  
+  function! neobundle#hooks.on_source(bundle)
+    set helplang=ja
+    " "q" でヘルプウィンドウが閉じられるようにする
     autocmd FileType help nnoremap <buffer>q <C-w>c
-augroup END
+  endfunction
+  
+  neobundle#untap()
+endif
+
+" help
+nnoremap <C-i> :<C-u>Unite -start-insert help<CR>
+nnoremap <C-i><C-i> :<C-u>UniteWithCursorWord help<CR>
 
 " "K" でヘルプを開く
 set keywordprg=:help
