@@ -190,7 +190,7 @@ if neobundle#tap('vimfiler.vim')
     \ })
   
   function! neobundle#hooks.on_source(bundle)
-    call unite#custom#profile('default', 'context', {
+    call vimfiler#custom#profile('default', 'context', {
       \   'safe': 0,
       \ })
   endfunction
@@ -269,8 +269,8 @@ set laststatus=2
 set showmode
 let g:lightline = {
   \ 'colorscheme': 'jellybeans',
-  \ 'active': {
   \ 'mode_map': {'c': 'NORMAL'},
+  \ 'active': {
   \   'left': [ [ 'mode', 'paste' ], [ 'fugitive', 'filename' ] ]
   \ },
   \ 'component_function': {
