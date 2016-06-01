@@ -45,3 +45,256 @@ firewall-cmd --list-service   #publicゾーンのサービス一覧
 firewall-cmd --add-service=http --permanent #publicゾーンにhttpサービスを追加
 firewall-cmd --remove-service=http #publicゾーンにhttpサービスを追加
 ```
+
+## Ver 7 から変わった点
+
+### ポイント
+
+- システムアーキテクチャが **init** から **systemd** に変更されている
+  - [http://www.slideshare.net/enakai/linux-27872553](Linux女子部 systemd徹底入門)
+- ネットワーク管理方式が変更
+- セキュリティ管理方式が **iptables** から **firewalld** に変更
+
+#### systemd
+
+- SysVinitの初期化スクリプトをいい塩梅に項目ごとに分けて最小単位「Unit」とした
+- Unit の種類（自：自動作成される　明：明示的に作成する）
+  - .service  :明: サービス（有効化したサービスが起動する）
+  - .target   :明: 何もしない（Unit の依存関係や順序関係を定義したり、グループ化するために使う）
+  - .mount    :自 /etc/fstab: マウントポイント（有効化するとマウントされる）
+  - .swap     :自 /etc/fstab: Swap領域（有効化するとSwap領域が有効になる）
+  - .device   :自 udev: デバイス（udev がデバイスを認識すると有効化される）
+  - .socket   :－: ソケット（systemdが特定のソケットをListenする。xinetdのようなもの。）
+- 定義ファイルの場所
+  - /etc/systemd/system/xxx     : 管理者がカスタマイズする（こっちが優先される）
+  - /usr/lib/sustemd/system/xxx : システムデフォルト
+- 「依存関係」と「順序関係」
+  - 「依存関係」=> 「A Unit を有効化するなら、B Unit も有効化すべき」という関係
+  - 「順序関係」=> 「A Unit を有効化する前に、B Unit を有効化すべき」という関係
+- systemd起動時「**default.target**」というUnitが有効化される => ランレベル
+  - 実体は「multi-user.target」「graphical.target」などへのシンボリックリンク
+- 依存関係
+  - [Unit]セクション  
+    => 一緒に有効化するUnitを指定する  
+    - [Wants=]    : 前提Unitが起動に失敗しても起動処理を継続する
+    - [Requires=] : 前提Unitが起動に失敗するとこのUnit起動処理をやめる
+  - 「<Unit>.wants」「<Unit>.requires」ディレクトリにシンボリックリンクを作成する
+  - [Conflicts=]  : 同時に有効化してはいけないUnitを指定
+
+  - サービスの自動起動
+    - *WantedBy=* に指定したUnitの「.wants」ディレクトリにシンボリックリンクを作成したり削除したりする。
+
+```
+/usr/lib/systemd/sshd.service
+----------------------------
+:
+[Install]
+WantedBy=multi-user.target
+:
+----------------------------
+```
+
+```
+# systemctl disable sshd.service
+rm '/etc/systemd/system/multi-user.target.wants/sshd.service'
+
+# systemctl enable sshd.service
+ln -s '/usr/lib/systemd/sshd.service' '/etc/systemd/system/multi-user.target.wants/sshd.service'
+```
+
+- 依存関係ツリー
+  - systemd は起動時に default.target を起動する
+  - ランレベルに応じて default.target のシンボリックリンクを変更する
+    - runlevel0 => poweroff.target 
+    - runlevel1 => rescie.target 
+    - runlevel2 => multi-user.target 
+    - runlevel3 => multi-user.target 
+    - runlevel4 => multi-user.target 
+    - runlevel5 => graphical.target 
+    - runlevel6 => reboot.target 
+  - graphical.target: Requires=multi-user.target
+    - multi-user.target: Requires=basic.target
+      - basic.target: Requires=sysinit.target
+        - sysinit.target: Wants=local-fs.target swap.target
+  - 設定変更
+
+```
+# 確認
+systemctl get-default
+
+# type=target一覧
+systemctl list-units --type=tareget
+
+# 変更
+systemctl set-default multi-user.target  # ランレベル３(CUI)
+systemctl set-default graphical.target   # ランレベル５(GUI)
+```
+
+
+- 順序関係
+  - [Unit]セクション
+    - Before=A B C  : 自分はUnit「A」「B」「C」の**前**に起動する
+    - After=A B C   : 自分はUnit「A」「B」「C」の**後**に起動する
+
+- コマンド
+
+```
+# 指定したUnitが必要とするUnitを表示
+systemctl list-dependencies <Unit>
+
+# 現在有効なUnitとその状態の一覧表示
+systemctl list-units [--type=service]
+
+# 定義されているUnitの一覧表示(= chkconfig --list)
+systemctl list-unit-files [--type=service]
+enabled : 「WantedBy=」指定があり、自動起動が有効。
+disabled: 「WantedBy=」指定があり、自動起動が無効。
+static  : 「WantedBy=」指定がない
+
+## static 以外のものに限定して表示
+systemctl list-unit-files --type=service | grep -Ev 'static\s+$'
+
+# サーバ起動時の自動機能有効化/無効化
+systemctl enable/disable <Unit>
+
+# Unitの起動/停止/再起動
+systemctl start/stop/restart <Unit>
+
+# Unitの実行状態表示
+systemctl status <Unit>
+
+# Unitの設定ファイルの変更をsystemdに通知する
+systemctl daemon-reload
+
+# cgroup
+systemctl kill -s9 sshd.service
+```
+
+- Unit 設定ファイル
+  - セクション
+    - [Unit]    : 依存関係/順序関係など。タイプに依存しない設定項目
+    - [Install] : systemctl enable/disable コマンドの動作の設定
+    - [タイプ固有のセクション]
+```
+[Unit]
+Description=Unitの説明
+Documentation=ドキュメントのURL
+Requires=|Wants=このUnitと同時に有効化が必要なUnit
+Before=このUnitより後に起動するUnit
+After=このUnitより先に起動するUnit
+
+[Install]
+WantedBy=   enable時にこのUnitの .wants ディレクトリにシンボリックリンクを作成する
+RequiredBy= enable時にこのUnitの .requires ディレクトリにシンボリックリンクを作成する
+Also=       enable/disable時に同時にenable/disableするUnit
+
+[Service]
+ExecStart=  サービス起動コマンド
+ExecReload= サービスリロードコマンド
+ExecStop=   サービス停止コマンド
+ExecStartPre/ExecStartPost サービス起動前後の追加コマンド（サービス起動判定には関連させたくないコマンドを記載）
+EnvironmentFile=環境変数を読み込むファイル
+```
+
+- ログ(journald)
+  - systemdの環境で、標準的に提供されるログ管理のサービスです
+  - 設定は「systemd-journald.service」
+  - 「/var/run/log/journal」に保存されるが、再起動すると消える領域である。  
+    「/var/log/journal」を作成すると永続的に保存する
+
+  - ログ確認方法
+
+```
+# すべてのログを表示（lessにパイプ）
+journalctl
+
+# すべてのログを表示（lessなし）
+journalctl -l --no-pager
+
+# 特定のサービスを指定
+journalctl -u xxx.service
+
+# メタデータを含めて表示
+journalctl -u xxx.service -o json-pretty
+
+# tail -f ライク
+journalctl -f
+```
+
+
+
+#### ipコマンド
+
+- ifconfig, route, netstat, arp などの旧ネットワーク関連コマンドはデフォルトで入っていない
+
+```
+# 以下でインストールする
+# yum install net-tools
+```
+
+- コマンド対比
+
+|**net-tools**|**iproute2**|
+|:---|:---|
+|ifconfig   |ip a(ddr) or ip l(ink)|
+|route      |ip r(route)|
+|netstat    |ss|
+|netstat -i |ip -s l(ink)|
+|arp        |ip n(eighbor)|
+
+#### NetworkManager
+
+- ネットワークを動的に設定するサービス
+- 設定内容（接続[connection]）とネットワークデバイス（デバイス[device]）を  
+  別々に定義して、それれを紐付けする。
+
+- [http://enakai00.hatenablog.com/entry/20140712/1405139841](RHEL7/CentOS7でipコマンドをマスター)
+
+- nmcli
+
+```
+# ホスト名表示
+nmcli g[lobal] hostname
+# systemdを使用しているのでこっちの方がいいか？
+hostnamectl
+
+# ホスト名変更
+nmcli g[lobal] hostname xxx
+hostnamectl xxx
+
+# インタフェースの起動・停止
+nmcli c[onnection] down <connection>
+nmcli c[onnection] up <connection>
+
+# 接続[connection]の情報の表示（設定項目の表示）
+nmcli c[onnection] show <connection>
+
+# 接続[connection]の情報の追加・削除
+nmcli c[onnection] add type eth ifname <device> con-name <connection>
+nmcli c[onnection] delete <connection>
+
+# 設定の変更
+nmcli c[onnection] mod[ify] <connection> <項目> <値> ...
+nmcli c mod eth0 ipv4.method manual ipv4.addresses "172.16.105.201/24 172.16.105.2"
+## 項目の追加・削除
+nmcli c[onnection] mod[ify] <connection> +<項目> <値> ...
+nmcli c[onnection] mod[ify] <connection> -<項目> <値> ...
+nmcli c mod eth0 +ipv4.dns 192.168.0.1
+nmcli c mod eth0 -ipv4.dns 192.168.0.1
+
+# デバイス一覧表示
+nmcli device
+# デバイス情報表示
+nmcli device show <device>
+```
+
+
+
+
+
+
+
+
+
+
+
