@@ -12,12 +12,17 @@
 
 ## コマンドレット
 
+- PowerShellのコマンドは**コマンドレット**と呼ぶ
+
 ```
 # ヘルプ
 Get-Help Get-ChildItem
 
 # コマンドレット一覧
 Get-Command
+
+# エイリアス一覧（これまで使用してきたコマンドはコマンドレットのエイリアスとして登録されている）
+Get-Alias
 
 # オブジェクトのメンバ表示
 Get-ChildItem | Get-Member
