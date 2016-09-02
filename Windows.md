@@ -23,3 +23,46 @@
 ## 構築
 - http://tanakh.jp/posts/2011-11-15-windows-terminal.html
 
+## ConEmu or Cmder
+
+- [ConEmu](https://conemu.github.io/)
+- [Cmder](http://cmder.net/)
+  - Windows用のコンソールエミュレータ
+    - 複数のシェルをタブで開ける
+    - タブごとに別のシェルを起動できる
+  - インストール
+    - Portable版をダウンロードして、PATHに追加する
+  - 設定（上右端のボタンからsettings）
+    - Main
+      - Main console font: Ricty
+      - Alternative font: Ricty
+      - Monospace: チェック外す（日本語カーソルがズレる）
+      - Anti-aliasing: Clear Type
+    - Startup
+      - Specified named task: {Nyagos}
+      - Tasks（＋で追加）
+        - グループ名: Nyagos
+        - Command: D:\software\Nyagos\nyagos.exe
+        - Up でTasksの一番上に移動する
+    - Features
+      - Colors
+        - Schemes: <Solarized>
+      - Transparency
+        - Active window transparency
+  - エイリアスの追加
+    - D:\software\Nyagos\nyagos.d\aliases.lua
+
+ ```
+alias{
+    ls='ls -oF $*',
+    ll='ls -ol',
+    lua_e=function(args) assert(load(args[1]))() end,
+    ["for"]='%COMSPEC% /c "@set PROMPT=$G & @for $*"',
+}
+ ```
+
+
+
+
+
+
