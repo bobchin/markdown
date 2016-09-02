@@ -175,6 +175,7 @@ systemctl kill -s9 sshd.service
     - [Unit]    : 依存関係/順序関係など。タイプに依存しない設定項目
     - [Install] : systemctl enable/disable コマンドの動作の設定
     - [タイプ固有のセクション]
+
 ```
 [Unit]
 Description=Unitの説明
@@ -250,16 +251,30 @@ journalctl -f
 
 - [http://enakai00.hatenablog.com/entry/20140712/1405139841](RHEL7/CentOS7でipコマンドをマスター)
 
+- NICネーミングルール
+  - ens6
+    - en: Ethernet | wl: wireless
+    - s: PCIExpress | o: onboard
+  - eno1, eno2: オンボードのNIC
+  - ens1, ens2: PCIExpressのNIC
+
 - nmcli
+
+ - コマンド
+   - connection: 接続の設定
+   - device    : デバイス管理
+   - general   : ホスト名、状態表示
+   - networking: 有効化・無効化の管理
+   - radio     : ワイヤレス設定
 
 ```
 # ホスト名表示
-nmcli g[lobal] hostname
+nmcli g[eneral] hostname
 # systemdを使用しているのでこっちの方がいいか？
 hostnamectl
 
 # ホスト名変更
-nmcli g[lobal] hostname xxx
+nmcli g[eneral] hostname xxx
 hostnamectl xxx
 
 # インタフェースの起動・停止
@@ -288,8 +303,108 @@ nmcli device
 nmcli device show <device>
 ```
 
+#### firewalld
+
+- 導入
+
+```
+# iptables とは併用できないので余計なのは停止しておく
+systemctl stop iptables.service
+systemctl stop ip6tables.service
+systemctl stop ebtables.service
+systemctl mask iptables.service
+systemctl mask ip6tables.service
+systemctl mask ebtables.service
+
+# firewalld パッケージの導入
+yum install firewalld
+systemctrl enable firewalld.service
+systemctrl start firewalld.service
+```
+
+- 内部的には iptables を使用しているが、設定の管理は firewalld サービスが担当する
+- ゾーン(zone)(フィルタリングルール)を定義して、それをNICに適用する
+
+- ゾーン
+  - /usr/lib/firewalld/zones/*.xml
+  - /etc/firewalld/zones/*.xml（こっちで上書きする）
+  - NICポートに明示的に指定しない場合は、「デフォルトゾーン」が適用される
+
+```
+firewall-cmd --get-default-zone
+firewall-cmd --set-default-zone=external
+
+# NICポートにゾーンを追加
+firewall-cmd --remove-interface=eth1                 # eth1 に適用したゾーンを削除
+firewall-cmd --add-interface=eth1 --zone=trusted     # eth1 にtrustedゾーンを適用
+firewall-cmd --query-interface=eth1 --zone=trusted   # eth1 にtrustedゾーンを適用されているか？
+firewall-cmd --list-interfaces --zone=trusted        # trustedゾーンが適用されているNICポートを表示
+firewall-cmd --change-interface=eth1 --zone=public
+※ --permanent をつけると起動時の設定を変更する
+```
+
+- サービス
+  - ポート番号を名前で管理する。ex) ssh => tcp 22
+  - /usr/lib/firewalld/services/*
+  - /etc/firewalld/services/*
+
+```
+# ゾーンにサービスを追加
+firewall-cmd --list-services --zone=public
+firewall-cmd --add-service=http --zone=public
+firewall-cmd --query-service=http --zone=public
+firewall-cmd --remove-service=http --zone=public
+```
+
+- icmp
+
+```
+# ゾーンにicmpを追加
+firewall-cmd --get-icmptypes
+firewall-cmd --list-icmp-blocks --zone=public
+firewall-cmd --add-icmp-block=echo-request --zone=public
+firewall-cmd --queryadd-icmp-block=echo-request --zone=public
+firewall-cmd --remove-icmp-block=echo-request --zone=public
+```
+
+- マスカレード/DNAP(ポートフォワード)
+
+```
+# マスカレード
+firewall-cmd --query-masquarade --zone=public
+firewall-cmd --add-masquarade --zone=public
+firewall-cmd --remove-masquarade --zone=public
+
+# DNAP(ポートフォワード)
+firewall-cmd --list-forward-ports --zone=public
+firewall-cmd --query-forward-port=<変換ルール> --zone=public
+firewall-cmd --add-forward-port=<変換ルール> --zone=public
+firewall-cmd --remove-forward-port=<変換ルール> --zone=public
+
+# 変換ルール
+port=22:proto=tcp:toport=3753         # 22番ポート宛のパケットを3753ポート宛に変更
+port=22:proto=tcp:toaddr=192.168.1.1  # 22番ポート宛のパケットを192.168.1.1に転送
+ex) firewall-cmd --add-forward-port=port=22:proto=tcp:toport=3753 --zone=public
+```
 
 
+- コマンド
+
+```
+# 状態確認
+systemctl status firewalld.service
+firewalld-cmd --state
+
+# ゾーンごとの設定
+firewall-cmd --list-all-zones
+
+# サービス一覧
+firewall-cmd --get-services
+firewall-cmd --get-icmptypes
+
+# 設定の読みなおし
+firewall-cmd --reload
+```
 
 
 
