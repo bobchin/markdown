@@ -221,6 +221,14 @@ filter PlusMinusToString {
 -3,-2,-1,0,1,2,3 | PlusMinusToString
 ```
 
+## 呼び出し演算子
+
+パスに空白が含まれているときなどに使用する。
+
+```
+PS C:\> & "C:\Program Files\xxxx\xxxx.exe"
+PS C:\> & { ls }
+```
 
 
 
