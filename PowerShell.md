@@ -29,6 +29,12 @@ Get-ChildItem | Get-Member
 "abc" | Get-Member
 ```
 
+## 変数
+
+- $PSVersionTable: バージョン確認
+- $PSHOME: powershell.exeの場所
+```
+
 ## ファイル操作
 
 - 移動
