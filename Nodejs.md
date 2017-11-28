@@ -50,10 +50,15 @@ PATH追加
 ```
 NODIST_PREFIX=D:\data\nodist
 PATH=%NODIST_PREFIX%\bin;%PATH%
+
 # node の REPL でモジュールをグローバルで見えるようにする場合追加
 NODE_PATH=%NODIST_PREFIX%\bin\node_modules;%NODE_PATH%
+
 # node の 64bit バージョンを使用する場合
 NODIST_X64=1
+
+# プロキシ
+HTTP_PROXY=http://myproxy.com:8213
 ```
 
 操作
