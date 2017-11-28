@@ -17,13 +17,16 @@
   - mingw gccが必要（cgoを使用する場合のみ）
   - [ダウンロード](https://golang.org/dl/) からzip版をダウンロード
   - zipを "D:\software\go" に解凍
-  - 環境変数 "GOROOT" を設定し、%GOROOT%\bin にPATHを通す
+  - 環境変数 "GOROOT" にインストールフォルダを設定する。
   - ワークスペースを作成（d:\data\go）し、環境変数 "GOPATH" を設定する
+  - 以下２つにPATHを通す
+    - %GOROOT%\bin
+    - %GOPATH%\bin
 
 ```
 SETX GOROOT D:\software\go /M
 SETX GOPATH D:\data\go /M
-SETX PATH %PATH%;%GOROOT%\bin
+SETX PATH %GOROOT%\bin;%GOPATH%\bin;%PATH%
 ```
 
   - 以下を作成し "go run hello.go" を実行して確認
@@ -43,15 +46,18 @@ func main() {
 
 ```
 go get -u -v github.com/nsf/gocode
-go get -u -v sourcegraph.com/sqs/goreturns
 go get -u -v github.com/tpng/gopkgs
-go get -u -v github.com/rogpeppe/godef
-go get -u -v github.com/golang/lint/golint
 go get -u -v github.com/lukehoban/go-outline
 go get -u -v github.com/newhook/go-symbols
 go get -u -v golang.org/x/tools/cmd/guru
 go get -u -v golang.org/x/tools/cmd/gorename
-
+go get -u -v github.com/fatih/gomodifytags
+go get -u -v github.com/josharian/impl
+go get -u -v github.com/rogpeppe/godef
+go get -u -v golang.org/x/tools/cmd/godoc
+go get -u -v sourcegraph.com/sqs/goreturns
+go get -u -v github.com/golang/lint/golint
+go get -u -v github.com/cweill/gotests/...
 go get -u -v github.com/derekparker/delve/cmd/dlv
 ```
 
