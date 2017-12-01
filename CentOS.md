@@ -14,7 +14,7 @@ rpm -ivh http://packages.sw.be/rpmforge-release/rpmforge-release-0.5.2-2.el6.rf.
 - epel
 
   - [Wiki](http://fedoraproject.org/wiki/EPEL/ja) ※リンクが古いので注意
-  - [](http://fedoraproject.org/wiki/EPEL)
+  - [fedora project](http://fedoraproject.org/wiki/EPEL)
   - [Download](http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/i386/repoview/epel-release.html)
 
 ```
@@ -45,6 +45,79 @@ firewall-cmd --list-service   #publicゾーンのサービス一覧
 firewall-cmd --add-service=http --permanent #publicゾーンにhttpサービスを追加
 firewall-cmd --remove-service=http #publicゾーンにhttpサービスを追加
 ```
+
+
+## インストール
+
+- minimalからインストールする（※はデフォルト値）
+  - **Install CentOS 7** を選択するとGUIが起動する。
+  - 言語の選択
+    - 日本語－日本語（日本）
+  - インストールの概要
+    - 日付と時刻：アジア/東京 タイムゾーン（※）
+    - キーボード：日本語（※）
+    - 言語サポート：日本語（日本）（※）
+    - インストールソース：ローカルメディア（※）
+    - ソフトウェアの選択：最小限のインストール（※）
+    - インストール先：自動パーティション（※）
+    - KDUMP：**無効**
+    - ネットワークとホスト名：オン
+      - ホスト名：centos7
+      - NIC
+        - 全般
+          - この接続が利用可能になったときは自動的に接続する：ON
+        - IPV4
+          - DHCP or 固定
+          - IP, サブネット, ゲートウェイ, DNS
+        - IPV6
+          - 無視する
+    - SECURITY POLICY：選択しない
+
+  - 設定
+    - ROOTパスワード：設定する
+    - ユーザ作成：作成する
+
+- GUIのインストール
+
+  - sudo権限の設定
+
+```
+# wheelグループに追加
+usermod -G wheel {username}
+
+visudo
+# 以下をコメントアウト
+
+Defaults env_keep += "HOME"
+%wheel ALL=(ALL) NOPASSWD: ALL
+```
+
+  - Gnomeインストール
+
+```
+# 確認
+yum group list
+
+# 日本語になっている場合は LANG=C をつける
+sudo [LAN=C] yum groupinstall "GNOME Desktop"
+
+# GUI起動に変更
+sudo systemctl get-default
+sudo systemctl set-default graphical.target
+```
+
+    - 初回起動時設定
+      - 日本語
+      - 日本語入力
+      - 位置情報サービス：オフ
+      - オンラインアカウントへの接続：スキップ
+
+    - VirtualBoxGnome Guest Additionインストール
+      - 開発ツールのインストール
+        - sudo [LAN=C] yum groupinstall "Development Tools"
+        - sudo [LAN=C] yum install kernel-devel kernel-headers
+      - イメージを割り当てると自動実行される
+
 
 ## Ver 7 から変わった点
 
