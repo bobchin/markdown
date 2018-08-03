@@ -286,3 +286,56 @@ var hello = require("hello.js");
 console.log(hello.Name);
 hello.hello("World");
 ```
+
+## npm (Node Packaged Modules)
+
+- Node.jsのパッケージマネージャ
+- Node.jsをインストールすると自動的にインストールされる
+
+```bash
+node -v
+npm -v
+```
+
+- 2つのモード
+  - フォルダは *node_modules* フォルダにインストールされる
+	- ローカルモード　：ワーキングディレクトリの下
+	- グローバルモード： *npm config get prefix* で表示されるディレクトリの下
+	  - nodist管理のWindowsの場合は「%NODIST%\bin\node_module」だった
+	  - **npm config set prefix=$HOME/.node_modules_global な感じで変更可能**
+
+- パッケージ操作
+
+```bash
+# インストール
+
+# パッケージ管理する
+npm init # package.jsonが作成される。このファイルで管理する。
+
+# グローバルモードは -g を指定する。つけなければローカルモード
+# --save を指定するとpackage.jsonに追記してくれる
+npm install serialport [-g] --save
+npm install serialport [--global] --save
+npm install serialport@1.0.0  --save # バージョン指定
+
+# リスト表示
+npm list [-g]
+npm list [-g] --depth 0 # 1段目だけ表示されて見やすい
+
+# 更新
+npm outdated # 更新の有無の確認
+npm update serialport
+```
+
+----
+
+- [Node.js](#nodejs)
+	- [バージョンについて](#%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)
+	- [nodebrew(Mac)](#nodebrewmac)
+	- [nodist(Windows)](#nodistwindows)
+		- [nvmw(Node Version Manager for Windows)](#nvmwnode-version-manager-for-windows)
+	- [nvm](#nvm%08)
+	- [for twitterbootstrap](#for-twitterbootstrap)
+	- [モジュール](#%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB)
+	- [exports](#exports)
+	- [npm (Node Packaged Modules)](#npm-node-packaged-modules)
