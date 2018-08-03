@@ -1,12 +1,26 @@
 # Node.js
 
+## バージョンについて
+
+- 0.12.x系と6.x系
+  - 一時期Node.jsが0.xの時代に開発が停滞し、io.jsというフォークが発生しバージョン1から3までできた。
+    その後統合されて4.0を名乗るようになった。
+	そのため **0.12.x系は過去のバージョン** という位置づけ。
+  - 現在は10.xというのが最新のものになる。
+  - バージョン体系は奇数が開発版、偶数が安定版
+	- 8.x : Maintenance
+	- 9.x : No LTS
+	- 10.x: Active
+
+
+
 ## nodebrew(Mac)
 
 - [nodebrew](https://github.com/hokaccha/nodebrew)
 
 - インストール
 
-```
+```bash
 # homebrew
 brew install nodebrew
 /usr/local/opt/nodebrew/bin/nodebrew setup_dirs
@@ -20,7 +34,7 @@ perl nodebrew setup
 
 - PATH
 
-```
+```bash
 # PATH
 export NODEBREW_ROOT=$HOME/.nodebrew
 export PATH=$NODEBREW_ROOT/current/bin:$PATH
