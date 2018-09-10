@@ -1,3 +1,22 @@
+# 目次
+
+- [目次](#%E7%9B%AE%E6%AC%A1)
+- [Node.js](#nodejs)
+	- [バージョンについて](#%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)
+	- [nodebrew(Mac)](#nodebrewmac)
+	- [nodist(Windows)](#nodistwindows)
+		- [nvmw(Node Version Manager for Windows)](#nvmwnode-version-manager-for-windows)
+	- [nvm](#nvm)
+	- [for twitterbootstrap](#for-twitterbootstrap)
+- [使い方](#%E4%BD%BF%E3%81%84%E6%96%B9)
+	- [モジュール](#%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB)
+	- [exports](#exports)
+	- [npm (Node Packaged Modules)](#npm-node-packaged-modules)
+- [デバッグ](#%E3%83%87%E3%83%90%E3%83%83%E3%82%B0)
+	- [VSCode](#vscode)
+- [おすすめモジュール](#%E3%81%8A%E3%81%99%E3%81%99%E3%82%81%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB)
+
+
 # Node.js
 
 ## バージョンについて
@@ -141,7 +160,7 @@ NODE_HOME=%NVMW_HOME%%NVMW_CURRENT%
 git clone git://github.com/hakobera/nvmw.git "D:\data\home\.nvmw"
 ```
 
-## nvm
+## nvm
 
 __※duplicated!__
 
@@ -175,6 +194,9 @@ nvm alias default v0.9.3	# デフォルトのバージョンを設定
 npm install -g less jshint recess uglify-js
 ```
 
+
+
+# 使い方
 
 ## モジュール
 
@@ -327,15 +349,40 @@ npm outdated # 更新の有無の確認
 npm update serialport
 ```
 
-----
+# デバッグ
 
-- [Node.js](#nodejs)
-	- [バージョンについて](#%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)
-	- [nodebrew(Mac)](#nodebrewmac)
-	- [nodist(Windows)](#nodistwindows)
-		- [nvmw(Node Version Manager for Windows)](#nvmwnode-version-manager-for-windows)
-	- [nvm](#nvm%08)
-	- [for twitterbootstrap](#for-twitterbootstrap)
-	- [モジュール](#%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB)
-	- [exports](#exports)
-	- [npm (Node Packaged Modules)](#npm-node-packaged-modules)
+- [Debugging Guide](https://nodejs.org/ja/docs/guides/debugging-getting-started/)
+
+## VSCode
+
+「デバッグ」-「構成を開く」を選択すると、「.vscode\launch.json」が作成される  
+もしくは左の「デバッグペイン」を開き、上部の「設定を追加」を選択する。
+
+「構成の追加」から「Node.js: nodemonのセットアップ」を選択。
+
+
+
+
+# おすすめモジュール
+
+- [nodemon](https://nodemon.io/)  
+  ソースの変更を監視して、自動的にサーバを再起動するユーティリティ
+  
+```javascript
+// インストール（グローバルでインストールした方がいいかな？）
+npm install -g nodemon
+
+// 使い方
+nodemon app.js
+
+// ローカルにインストールした場合
+//./node_module/.bin/nodemon app.js
+```
+
+
+
+
+- あ
+
+
+
