@@ -35,7 +35,7 @@ SETX PATH %GOROOT%\bin;%GOPATH%\bin;%PATH%
 #hello.go
 
 package main
-inport "fmt"
+import "fmt"
 
 func main() {
     fmt.Print("Hello, world\n")
