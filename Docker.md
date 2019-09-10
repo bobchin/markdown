@@ -20,12 +20,27 @@
   - 「Insatall VirtualBox with NDIS5 driver」にチェック
   - 「VirtualBox」や「Git」はすでに入っているならいれなくてもいいかも
   - 「Docker Quickstart Terminal」を実行すると、VirualBox上に環境を作成するので少し時間がかかる
+  - https でない通信も有効にする設定
+
+```sh
+docker-machine ssh
+# /etc/docker/daemon.json
+{ "insecure-registries" : ["192.168.99.100:5000"] }
+```
+
 
 ## 用語
 
 - Dockerイメージ: コンテナを作成するための設計図みたいなもの
 - Dockerコンテナ: Dockerイメージを基に作成される実態。実行された状態。
 - Docker Hub: Dockerイメージを作成するためのベースとなるイメージがたくさんある？
+- Dockerホスト: Dockerコンテナを実行するサーバ。
+- DockerCompose: 単一ホストで複数コンテナを扱う場合に一括して管理できる。
+- Data Volume: ホストとDockerコンテナで共有する領域。ホストのファイルシステムをマウントするイメージ。
+- Data Volume コンテナ: Data Volumeではホストのファイルシステムに依存してしまうので、共有する領域をコンテナにする。
+- Docker Swarm: 複数ホスト（マルチホスト）を束ねてクラスタ化する
+- Docker Service: Swarm内でクラスタ内の複数のコンテナを管理する
+- Docker Stack: Swarm内で複数のServiceをまとめて管理する
 
 ## docker-machineコマンド
 
@@ -57,6 +72,7 @@ docker-machine ls
 
 # イメージの作成と削除
 docker-machine create --driver virtualbox default
+docker-machine create -d virtualbox --virtualbox-disk-size 40000 default # サイズ指定
 docker-machine rm default
 ```
 
@@ -97,6 +113,7 @@ IPを確認して接続すること。
 # docker image build -t イメージ名[:タグ名] Dockerfileがあるのパス
 # カレントにDockerfileがある場合
 docker image build -t example/echo:latest .
+# -t: イメージ・タグ名を指定する
 # -f: 指示ファイルがDockerfileではないときにファイル名を指定する
 # --pull=true: build時にFROMから取得するベースイメージをキャッシュを使わずに必ずダウンロードする
 ```
@@ -114,8 +131,6 @@ docker image build -t example/echo:latest .
 # -d: バックグラウンド実行
 # -p: ポートフォワード(外部ポート:内部ポート)
 docker container run -it -d -p 9000:8080 [イメージ:タグ]
-
-
 ```
 
 
