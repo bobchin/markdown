@@ -7,13 +7,49 @@
 
 ### Windows
 
-- Docker for Windows を使う場合
-  - Windows10 Pro 以上
-  - Hyper-V
-    - 「タスクマネージャ」の「パフォーマンス」で「仮想化」が有効になっているか？
-    - BIOS(UEFI)で仮想化を有効化（Intel: Intel Virtualization Technology, AMD: SVM）
+- 種類
+  - Docker Desktop for Windows
+    - Docker Engine
+    - Docker CLI client
+    - Docker Compose
+    - Notary
+    - Kubernetes
+    - Credential Helper
+  - Docker for Windows(Docker Toolbox): 古い？
+    - Docker Engine
+    - Docker Compose
+    - Kubernetes
+    - VirtualBox
 
-- Docker Toolbox
+- 要件
+  - Windows10 64bit Pro/Enterprise/Education 以上
+  - Hyper-Vを有効 => Docker Desktopを実行するのに必要
+    - 「タスクマネージャ」の「パフォーマンス」で「仮想化」が有効になっているか？
+  - Second Level Address Translation(SLAT)
+  - 4GB RAM
+  - BIOS(UEFI)で仮想化を有効化（Intel: Intel Virtualization Technology, AMD: SVM）
+
+- インストール（Docker Desktop for Windows）
+  - [Download](https://hub.docker.com/editions/community/docker-ce-desktop-windows/)
+  - [Stable](https://download.docker.com/win/stable/Docker%20Desktop%20Installer.exe)
+  - 基本的にはexeをインストールするだけ
+    - Configuration
+      - Enable required Windows Features: On
+      - Add shortcut to desktop: On
+  - メモリ不足で起動しない場合は以下あたりを調整
+    - CPU
+    - メモリ
+    - swap
+  - ca.pemどうのこうののエラーが出る。以前にDockerToolboxを使用していた場合環境変数が残るらしい。
+    ```
+    SET DOCKER_CERT_PATH=
+    SET DOCKER_HOST=
+    SET DOCKER_MACHINE_NAME=
+    SET DOCKER_TLS_VERIFY=
+    SET DOCKER_TOOLBOX_INSTALL_PATH=
+    ```
+
+- （古い）Docker Toolbox
   - Virtual Box
   - Hyper-V を無効に
   - [Download](https://download.docker.com/win/stable/DockerToolbox.exe)
