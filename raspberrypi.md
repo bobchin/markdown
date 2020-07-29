@@ -1,28 +1,127 @@
 # Raspberry Pi
 
+## ドキュメント等
+
+- [Raspberry Pi Documentation](https://www.raspberrypi.org/documentation/)
+- [インストール](https://www.raspberrypi.org/documentation/installation/)
+- [ダウンロード](https://www.raspberrypi.org/downloads/)
+
 ## Raspbian インストール
 
-- イメージダウンロード　[ダウンロード](https://www.raspberrypi.org/downloads/raspbian/)
+- OSの種類
+  - Raspberry Pi OS (32-bit)
+    - desktop and recommended software(Debian Busterベースのデスクトップ＋推奨アプリ)
+    - desktop(Debian Busterベースのデスクトップのみ)
+    - Lite(Debian Busterベースの最小イメージ)
 
-  - "Raspbian XXX with desktop" をダウンロード(XXX はバージョン名)
+  - NOOBS（New Out Of the Box Software）: OSのインストーラ付きの環境
+    - NOOBS
+    - NOOBS Lite
 
-- SD カードをフォーマットする
+- SDカードのフォーマット
+  - [SD Formatter](https://www.sdcard.org/downloads/formatter/)
+  - 手動でフォーマットする
+    - Raspberry Pi は FAT(FAT16/FAT32)のみ対応
+    - 32GB 以上の SD カードは exFAT でフォーマットされているので注意
 
-  - Raspberry Pi は FAT(FAT16/FAT32)のみ対応
-  - 32GB 以上の SD カードは exFAT でフォーマットされているので注意
+      ```sh
+      # Windows
+      エクスプローラでフォーマット
 
-    ```
-    # Windows
-    エクスプローラでフォーマット
+      # Mac
+      # ディスク一覧
+      diskutil list
+      diskutil eraseDisk MS-DOS RPI disk2
+      ```
 
-    # Mac
-    # ディスク一覧
+- イメージのコピー
+  - Mac
+
+    ```sh
     diskutil list
-    diskutil eraseDisk MS-DOS RPI disk2
+    # example
+    --------------------------------
+    /dev/disk0 (internal):
+    /dev/disk1 (synthesized):
+    /dev/disk2 (external, physical):
+    --------------------------------
+
+    diskutil unmountDisk /dev/disk2
+    sudo dd bs=1m if=raspios.img of=/dev/rdisk2; sync # diskNの代わりにrdiskNを使った方が速い
+    sudo diskutil eject /dev/rdisk2
     ```
 
-- イメージを SD カードにコピー
-  - [balenaEtcher](https://www.balena.io/etcher/)
+  - Windows
+    - [balenaEtcher](https://www.balena.io/etcher/)
+    - [Win32DiskImager](https://sourceforge.net/projects/win32diskimager/)
+    - [Upswift imgFlasher](https://www.upswift.io/imgflasher/)
+
+- イメージのバックアップ
+  - Mac
+
+    ```sh
+    diskutil list
+    # example
+    --------------------------------
+    /dev/disk0 (internal):
+    /dev/disk1 (synthesized):
+    /dev/disk2 (external, physical):
+    --------------------------------
+
+    diskutil unmountDisk /dev/disk2
+    sudo dd bs=1m if=/dev/disk2 of=raspios.img
+    sudo diskutil eject /dev/disk2
+    ```
+
+  - Windows
+    - [Win32DiskImager](https://sourceforge.net/projects/win32diskimager/)
+
+- インストール
+  - **[Raspberry Pi Imager](https://downloads.raspberrypi.org/imager/imager_1.4.exe)** を使う
+    - SDカードへのコピーも早くて簡単？
+    - アプリケーション起動後に、「インストールするOS」と「インストール先(SDカード)」を選択するだけ
+    - OSとしてダウンロードせずに「Use custom」でイメージファイル(.img)を選択可能
+
+  - NOOBSを使う
+    - SDカードをフォーマット
+    - [NOOBSイメージ](https://www.raspberrypi.org/downloads/noobs/)をダウンロードし、ファイルの中身をSDカードにコピー
+
+  - 手動でインストール
+    - イメージダウンロード　[ダウンロード](https://www.raspberrypi.org/downloads/raspbian/)
+      - "Raspbian XXX with desktop" をダウンロード(XXX はバージョン名)
+    - SD カードをフォーマット
+    - イメージを SD カードにコピー
+
+- アップデート
+
+  ```sh
+  # アプリケーション取得元のリスト
+  sudo vi /etc/apt/sources.list
+  # リストのアップデート
+  sudo apt update
+
+  # アプリケーションインストール
+  sudo apt install [app]
+  # 削除
+  sudo apt remove [app]
+  # 設定ファイルも含めて削除
+  sudo apt purge [app]
+
+  # アップグレード
+  sudo apt full-upgrade
+
+  # スペース確保(/var/cache/apt/archives)
+  sudo apt clean
+  sudo apt autoremove
+  sudo apt autoclean
+
+  # 検索
+  apt-cache search [app]
+  apt-cache show [app]
+
+  # パッケージ構成を変える更新
+  sudo apt dist-upgrade
+  ```
 
 ### Raspbian 設定
 
@@ -31,11 +130,16 @@
     - SSH
     - SPI
     - I2C
+- CUI
+
+  ```sh
+  raspi-config
+  ```
 
 - wifi
   - /etc/wpa_supplicant/wpa_supplicant.conf
 
-  ```
+  ```sh
   ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
   update_config=1
   country=JP
@@ -50,11 +154,191 @@
 
 - 日本語入力
 
-  ```
+  ```sh
   sudo apt-get update
   sudo apt-get install fcitx-mozc
   ```
 
+- カスタマイズ
+
+  ```sh
+  # vim
+  sudo apt install vim
+  # ~/.vimrc
+  # VimをVi互換にしない
+  set nocompatible
+  # 挿入モードの削除の動作
+  set backspace=indent,eol,start
+  # 行挿入開始時にインデントを揃える
+  set autoindent
+  # 行の折り返し表示をしない
+  set nowrap
+  # 構文ハイライト表示を有効に
+  syntax on
+  colorscheme torte
+
+  # ~/.bash_aliases
+  alias sudo='sudo -E'
+  alias ls='ls -lhAF --color=auto'
+  alias ll='ls -l'
+  alias la='ls -a'
+  alias pd='pushd'
+  alias po='popd'
+  ```
+
+## デバイス関連
+
+- USB
+  - Bus: 複数のバス（信号線）を持つ
+    - Port: Busごとにポートがある。ポートががポートを持つこともあり（USBハブ？）。
+    - Device: 一意の値
+      - ID: "vendor:product" という形式
+      - If: 複数のインタフェースを持つ
+        - Class: デバイスの機能
+
+  ```sh
+  # デバイスの確認
+  lsusb
+  # Bus [バス番号] Device [デバイス番号]: ID [ベンダーID]:[プロダクトID] [デバイスの説明]
+  Bus 001 Device 006: ID 0424:7800 Standard Microsystems Corp.
+  Bus 001 Device 003: ID 0424:2514 Standard Microsystems Corp. USB 2.0 Hub
+  Bus 001 Device 002: ID 0424:2514 Standard Microsystems Corp. USB 2.0 Hub
+  Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+
+  lsusb -t # ツリー表示
+  lsusb -s busnum:devnum  # バス番号とデバイス番号 ex) lsusb -s 1:3
+  lsusb -d vendor:product # ベンダーIDとプロダクトID ex) lsusb -d 0424:2514
+
+  # 詳細表示(/dev/bus/usb/[busno]/[deviceno])
+  lsusb -D /dev/bus/usb/001/003
+  ```
+
+## ストリーミング
+
+- 構成
+  - nginx の rtmp モジュールを使用して、自身がRTMPサーバ（映像受信サーバ）となる。
+    また、そのままHLSやMPEG-DASHサーバとなりストリーミングを公開する。
+  - RTMP で受信した映像はファイル化されるので書き込み領域をRAMディスク化する。
+
+- インストール
+
+  ```sh
+  sudo apt install nginx libnginx-mod-rtmp ffmpeg
+  ```
+
+- nginx
+
+  ```sh
+  # /etc/nginx/rtmp.conf
+  rtmp {
+    server {
+      listen 1935;
+      chunk_size 4096;
+
+      application live {
+        # LIVE
+        live on;
+        record off;
+        wait_key on;
+        wait_video on;
+        sync 10ms;
+
+        # HLS
+        hls on;
+        hls_path /var/www/html/live/hls;
+        hls_fragment 3s;
+        hls_type live;
+
+        # MPEG-DASH
+        dash on;
+        dash_path /var/www/html/live/dash;
+        dash_fragment 3s;
+      }
+    }
+  }
+
+  # モジュールを読み込むように
+  ln -s /etc/nginx/rtmp.conf /etc/nginx/modules-enabled
+  ```
+
+- RAMディスク化
+
+  ```sh
+  # /etc/fstab
+  tmpfs /var/www/html/live  tmpfs defaults,size=64m,noatime,mode=1777  0 0
+  ```
+
+  - fstab
+    - filesystem: マウントされるパーティションやストレージデバイス
+    - dir       : マウントポイント
+    - type      : ファイルシステム
+    - options   : ファイルシステムのマウントオプション
+      - defaults : デフォルト設定を使う(rw, suid, dev, exec, auto, nouser, async)
+        - rw     : 読み書きモードでマウント
+        - suid   : set user IDビットを許可する
+        - dev    : キャラクタデバイス・ブロックデバイスを受け取る
+        - exec   : バイナリの実行を許可
+        - auto   : mount -a でマウントする
+        - nouser : 一般ユーザはマウントできない
+        - async  : 非同期にI/Oを処理する
+      - size     : 割り当てるサイズ
+      - noatime  : inodeアクセス時間を更新しない
+      - mode     : mode&0777 のパーミンションを当てる
+    - dump      : dumpコマンドによるバックアップの対象にするか
+    - pass      : 起動時にfsckがチェックする順
+
+- クライアント表示用ブラウザプレーヤー
+  - HLS
+
+    ```html
+    <!DOCTYPE html>
+    <html lang="ja">
+    <head>
+      <meta charset="utf-8"/>
+      <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    </head>
+
+    <body>
+      <video id="video" controls width="95%"></video>
+      <script>
+        if(Hls.isSupported()) {
+          var video = document.getElementById('video');
+          var hls = new Hls();
+          hls.loadSource('live/hls/stream.m3u8');
+          hls.attachMedia(video);
+          hls.on(Hls.Events.MANIFEST_PARSED,function() {
+          video.play();
+        });
+      }
+      </script>
+    <p>
+      iPhoneなどで再生されない場合は、<a href="live/hls/stream.m3u8">こちら</a>をクリック。
+    </p>
+    </body>
+    </html>
+    ```
+
+  - MPEG-DASH
+
+    ```html
+    <!doctype html>
+    <html lang="ja">
+    <head>
+      <meta charset="utf-8"/>
+      <script src="http://cdn.dashjs.org/latest/dash.all.min.js"></script>
+    </head>
+    <body>
+        <video id="video" controls width="95%"></video>
+        <script>
+            (function(){
+                var url = "live/dash/stream.mpd";
+                var player = dashjs.MediaPlayer().create();
+                player.initialize(document.querySelector("#video"), url, true);
+            })();
+        </script>
+    </body>
+    </html>
+    ```
 
 ## ラズパイ入門ボード
 
@@ -74,25 +358,24 @@
     - **SPI** と **I2C** を有効にする
   - 制御方法 Python と GPIO ライブラリ(RPi.GPPIO)のアップデート
 
-    ```
+    ```sh
     sudo apt-get update
     sudo apt-get install python-rpi.gpio python3-rpi.gpio
     ```
 
   - 制御方法 pigpio ライブラリのアップデート
 
-    ```
+    ```sh
     sudo apt-get update
     sudo apt-get install pigpio python-pigpio python3-pigpio
     ```
 
   - pip
 
-    ```
+    ```sh
     sudo apt-get update
     sudo apt-get install python-pip python3-pip
     ```
-
 
 - GPIO の対応表
 
@@ -116,7 +399,7 @@
 
 - ファイル
 
-  ```
+  ```sh
   # entryboard.py
   LED1 = 14
   LED2 = 15
@@ -152,14 +435,13 @@ Adafruit Industries社の "SSD1306 OLD モジュール" と互換性がある。
 
 - フォントのインストール
 
-  ```bash
+  ```sh
   sudo apt-get install fonts-takao
   ```
 
 - 設定
   - デスクトップ左上のｐメインメニューより、「設定」-「Raspberry Pi の設定」
     - **SPI** を有効にする
-
 
 ## nfcpy
 
@@ -187,7 +469,7 @@ Adafruit Industries社の "SSD1306 OLD モジュール" と互換性がある。
 
   - インストール
 
-    ```
+    ```sh
     sudo apt-get install python-usb python-pip
     sudo pip install -U nfcpy
     sudo reboot
