@@ -213,6 +213,34 @@
   lsusb -D /dev/bus/usb/001/003
   ```
 
+- 映像デバイス
+  - v4l2(Video for Linux 2): Linuxでビデオを扱うための統一的なAPIを使う。特にUVCカメラを使う場合はこれを使う。
+
+    ```sh
+    # v4l2で扱えるデバイスのリスト
+    v4l2-ctl --list-devices
+    # デバイスの情報を表示
+    v4l2-ctl -d /dev/video0 --all
+    v4l2-ctl -d /dev/video0 --info
+    v4l2-ctl -d /dev/video0 --list-formats
+    v4l2-ctl -d /dev/video0 --list-formats-ext
+    ```
+
+  - フォーマット
+    - YUYV
+    - MJEPG
+
+- 音声デバイス
+  - ALSA(Advanced Linux Sound Architecture): Linuxでサウンドを扱うためのAPI
+
+    ```sh
+    # 音声入力デバイスの表示（カード番号とデバイス番号が必要になる）
+    arecord -l
+
+    # ffmpegで指定する場合（カード:2, デバイス:0）に以下のようになる
+    -i hw:2,0
+    ```
+
 ## ストリーミング
 
 - 構成
@@ -339,6 +367,128 @@
     </body>
     </html>
     ```
+
+## AirPlay
+
+- [RPiPlay](https://github.com/FD-/RPiPlay)
+
+  ```sh
+  # 依存パッケージ
+  sudo apt-get install cmake
+  sudo apt-get install libavahi-compat-libdnssd-dev
+  sudo apt-get install libplist-dev
+  sudo apt-get install libssl-dev
+
+  # コンパイル
+  mkdir -p ~/rpiplay
+  cd ~/rpiplay
+  git clone https://github.com/FD-/RPiPlay.git
+  cd RPiPlay
+  mkdir build
+  cd build
+  cmake ..
+  make
+
+  # 実行
+  ./rpiplay
+
+  -n: クライアントに表示される名前
+  -b: (on|auto|off)背景表示を常に表示|接続があるときのみ|表示しない
+  -r: (90|180|270)画面の回転
+  -l: 低遅延モードを有効にする
+  -a: (hdmi|analog|off)音声出力
+  -d: デバッグを有効にする
+  -h: ヘルプ
+
+  # 自動起動に登録する
+  # rpiplay.service
+  ---------------------------------
+  [Unit]
+  Description=RPi Play
+  After=network.target
+  StartLimitIntervalSec=30
+
+  [Service]
+  Type=simple
+  Restart=always
+  RestartSec=10
+  User=pi
+  ExecStart=/home/pi/rpiplay/RPiPlay/build/rpiplay -n らずべりーぱいぱい -b auto -a analog
+  StandardOutput=inherit
+  StandardError=journal
+
+  [Install]
+  WantedBy=multi-user.target
+  ---------------------------------
+
+  ## 登録
+  sudo ln -s /home/pi/rpiplay/RPiPlay/build/rpiplay.service /etc/systemd/system/
+  sudo systemctl enable rpiplay
+  ```
+
+- [ShareportSync](https://github.com/mikebrady/shairport-sync)
+
+  ```sh
+  # 依存パッケージ
+  sudo apt-get install libshairport2
+  sudo apt-get install autoconf
+  sudo apt-get install libtool
+  sudo apt-get install libdaemon-dev
+  sudo apt-get install libasound2-dev
+  sudo apt-get install libpopt-dev
+  sudo apt-get install libconfig-dev
+  sudo apt-get install avahi-daemon
+  sudo apt-get install libavahi-client-dev
+  sudo apt-get install libssl-dev
+  sudo apt-get install libsoxr-dev
+
+  # コンパイル
+  mkdir -p ~/shairport-sync
+  cd ~/shairport-sync
+  git clone https://github.com/mikebrady/shairport-sync.git
+  cd shairport-sync
+  autoreconf -i -f
+  ./configure --with-alsa --with-avahi --with-ssl=openssl --with-metadata --with-soxr --with-systemd
+  make
+  make install
+
+  # 設定(/usr/local/etc/shairport-sync.conf)
+  general =
+  {
+    name = "shairport-sync";
+  }
+  alsa =
+  {
+    output_device = "plughw:1,0";
+  }
+
+  # 自動起動に登録する
+  sudo systemctl enable shairport-sync
+  ```
+
+## Miracast
+
+- [Lazycast](https://github.com/homeworkc/lazycast)
+
+  ```sh
+  # 依存関係
+  sudo apt install net-tools python udhcpd
+  sudo apt install libx11-dev libasound2-dev libavformat-dev libavcodec-dev
+
+  cd /opt/vc/src/hello_pi/libs/ilclient/
+  make
+  cd /opt/vc/src/hello_pi/hello_video
+  make
+
+  mkdir -p ~/lazycast
+  cd ~/lazycast
+  git clone https://github.com/homeworkc/lazycast.git
+  cd lazycast
+
+  # 自動起動に登録する
+  sudo ln -s /home/pi/lazycast/lazycast/lazycast.service /etc/systemd/system/
+  sudo systemctl enable lazycast
+  ```
 
 ## ラズパイ入門ボード
 
