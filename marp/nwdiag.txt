@@ -1,0 +1,25 @@
+nwdiag{
+    network internet{
+        rtx830 [address = "61.213.110.203"]
+    }
+
+    network work {
+        address: "172.17.17.0/24"
+
+        rtx830 [address = "172.17.1.254"]
+    }
+
+    network camera {
+        address: "192.168.111.0/24"
+
+        rtx830 [address = "192.168.111.254"]
+    }
+
+    network customer {
+        address: "192.168.200.0/24"
+
+        rtx830 [address = "192.168.200.254"]
+    }
+}
+
+https://kroki.io/nwdiag/svg/https://kroki.io/nwdiag/svg/eNqVkU1rwzAMhu_-FSb3eJKctSmjpx6aY-gOg40dTGK2sNYZjkcHo_99drqSpNRlFcb445Hk1y8z-7pRbz-M-zDa7Vv7wRvjtPUbfjwOYd13LoG_qLq2uuv4kiczFIRSIIIgkMnrQw8f2KRUPw1lRuk4J4HzMOCOsoRda3ViBd1np0YhntZEAEUZg2EKYx7gLEJnizFdrob1405Z9_neGj26t_0vXRRdqZ226pLsBBe-3Sz3v4b_0T2iz6RvdNXaWtsojzBRvzq-KUqnSBELq6_OtT45YuNfEe_DDYICfe7l8yYtynQtgYorOXIiatto47oojqmEQdWB_QL5KbNB
