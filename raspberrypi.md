@@ -5,6 +5,7 @@
   - [Raspbian インストール](#raspbian-インストール)
     - [Raspbian 設定](#raspbian-設定)
   - [デバイス関連](#デバイス関連)
+  - [momo(WebRTC)](#momowebrtc)
   - [ストリーミング](#ストリーミング)
   - [ストリーミング２](#ストリーミング２)
   - [AirPlay](#airplay)
@@ -244,6 +245,8 @@
     - MJEPG
 
 - 音声デバイス
+  - [Raspberry Piのオーディオの仕組み](https://www.ukeyslabo.com/raspberry-pi/audio/)
+  - [Raspberry Pi で再生と録音を行う](https://blog.natade.net/2019/08/27/raspberry-pi-%E5%86%8D%E7%94%9F-%E9%8C%B2%E9%9F%B3-%E3%83%87%E3%83%90%E3%82%A4%E3%82%B9/)
   - ALSA(Advanced Linux Sound Architecture): Linuxでサウンドを扱うためのAPI
 
     ```sh
@@ -252,6 +255,67 @@
 
     # 音声出力デバイスの表示
     aplay -l
+
+    # サンプル
+    # カード番号Xを使用して、"plughw:X" と指定することができる
+    # デバイス番号Yを使用して、"plughw:X,Y" と指定することができる
+    # サブデバイス番号Zを使用して、"plughw:X,Y,Z" と指定することができる
+    aplay -l
+
+    **** ハードウェアデバイス PLAYBACK のリスト ****
+    カード 0: b1 [bcm2835 HDMI 1], デバイス 0: bcm2835 HDMI 1 [bcm2835 HDMI 1]
+    サブデバイス: 4/4
+    サブデバイス #0: subdevice #0
+    サブデバイス #1: subdevice #1
+    サブデバイス #2: subdevice #2
+    サブデバイス #3: subdevice #3
+    カード 1: Headphones [bcm2835 Headphones], デバイス 0: bcm2835 Headphones [bcm2835 Headphones]
+    サブデバイス: 4/4
+    サブデバイス #0: subdevice #0
+    サブデバイス #1: subdevice #1
+    サブデバイス #2: subdevice #2
+    サブデバイス #3: subdevice #3
+
+    arecord -l
+
+    **** ハードウェアデバイス CAPTURE のリスト ****
+    カード 2: U0x46d0x81d [USB Device 0x46d:0x81d], デバイス 0: USB Audio [USB Audio]
+    サブデバイス: 1/1
+    サブデバイス #0: subdevice #0
+
+    # サウンドカードの確認（playback: スピーカー, capture: マイク）
+    cat /proc/asound/cards
+
+      0: [ 0]   : control
+    16: [ 0- 0]: digital audio playback
+    32: [ 1]   : control
+    33:        : timer
+    48: [ 1- 0]: digital audio playback
+    64: [ 2]   : control
+    88: [ 2- 0]: digital audio capture
+
+    # PCMストリームの確認（XX-YY: XXカード番号, YYデバイス番号）
+    cat /proc/asound/pcm
+
+    00-00: bcm2835 HDMI 1 : bcm2835 HDMI 1 : playback 4
+    01-00: bcm2835 Headphones : bcm2835 Headphones : playback 4
+    02-00: USB Audio : USB Audio : capture 1
+
+    # デバイスの優先度
+    cat /proc/asound/modules
+
+    0 snd_bcm2835
+    1 snd_bcm2835
+    2 snd_usb_audio
+
+    # オーディオデバイス順を変える
+    # /etc/modprobe.d/alsa-base.conf
+    options snd slots=snd_usb_audio,snd_bcm2835
+    options snd_usb_audio index=0
+    options snd_bcm2835 index=1
+
+    # オーディオデバイス番号を指定
+    export ALSADEV="pluginw:1,0"
 
     # ffmpegで指定する場合（カード:2, デバイス:0）に以下のようになる
     -i hw:2,0
@@ -263,6 +327,30 @@
   # GUIで無効にした場合に有効に戻す
   # rfkillが使われている？
   rfkill unblock wifi
+  ```
+
+## momo(WebRTC)
+
+- [WebRTC Native Client Momo](https://momo.shiguredo.jp)
+- [Github](https://github.com/shiguredo/momo)
+
+- インストール
+
+  ```sh
+  mkdir -p ~/momo
+  cd ~/momo
+  wget https://github.com/shiguredo/momo/releases/download/2020.8.1/momo-2020.8.1_raspberry-pi-os_armv7.tar.gz
+  tar xvfz momo-2020.8.1_raspberry-pi-os_armv7.tar.gz
+
+  # ラズパイのアップデート
+  sudo apt update
+  sudo apt upgrade
+
+  # 必要ライブラリのインストール
+  sudo apt install libnspr4 libnss3 libsdl2-dev
+
+  # 音声が入らない場合
+  sudo apt install pulseaudio
   ```
 
 ## ストリーミング
