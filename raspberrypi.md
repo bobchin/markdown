@@ -5,6 +5,7 @@
   - [Raspbian インストール](#raspbian-インストール)
     - [Raspbian 設定](#raspbian-設定)
   - [デバイス関連](#デバイス関連)
+  - [リモート管理](#リモート管理)
   - [momo(WebRTC)](#momowebrtc)
   - [ストリーミング](#ストリーミング)
   - [ストリーミング２](#ストリーミング２)
@@ -200,6 +201,40 @@
   alias po='popd'
   ```
 
+  - HDMIを必ず認識させる
+
+    ```bash
+    # /boot/config.txt
+    # コメントを外す
+    hdmi_force_hotplug=1
+    ```
+
+  - 起動速度確認
+
+    ```bash
+    systemd-analyze time
+    systemd-analyze blame
+    ```
+
+  - 仮想ネットワーク
+
+    ```bash
+    # /etc/network/interface.d/eth0:1
+    auto eth0:1
+    iface eth0:1 inet static
+    address 172.17.1.85
+    netmask 255.255.255.0
+    gateway 172.17.1.254
+    # dns-domain hoge.local
+    # dns-nameserver 172.17.1.254
+    ```
+
+  - wifiパワーマネジメント無効
+
+    ```bash
+    sudo iw dev wlan0 set power_save off
+    ```
+
 ## デバイス関連
 
 - USB
@@ -327,6 +362,20 @@
   # GUIで無効にした場合に有効に戻す
   # rfkillが使われている？
   rfkill unblock wifi
+  ```
+
+## リモート管理
+
+- [remote.it](https://remote.it/)
+
+  ```bash
+  # サインアップしてIDを登録しておく
+  sudo apt install remoteit
+
+  # http://172.17.1.82:29999 にアクセスして、上記登録したIDでログインする
+
+  # 自動アップデート
+  nohup sudo apt install remoteit &
   ```
 
 ## momo(WebRTC)
@@ -486,14 +535,22 @@
 
   ```sh
   # コンパイル
-  git clone https://github.com/ossrs/srs.git srs
-  cd ~/srs/trunk
+  git clone https://gitee.com/winlinvip/srs.oschina.git srs
+  cd srs/trunk
   git remote set-url origin https://github.com/ossrs/srs.git && git pull
+  # git clone https://github.com/ossrs/srs.git
+  # cd srs/trunk
   ./configure
   make
 
   # 起動
   ./objs/srs -c conf/rtmp.conf
+
+  # systemctl
+  sudo ln -sf srs/trunk/etc/init.d/srs /etc/init.d/srs
+  sudo cp -f srs/trunk/usr/lib/systemd/system/srs.service /usr/lib/systemd/system/srs.service
+  sudo systemctrl daemon-reload
+  sudo systemctrl enable srs
   ```
 
 ## AirPlay
