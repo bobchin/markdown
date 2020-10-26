@@ -81,10 +81,90 @@
 （相手側）
 ++ RTCIceCandidate オブジェクトを生成して、peerConnection#addIceCandidate() で追加
 
+## 使い方
+
+- getUserMedia
+
+  ```js
+  # MediaStreamクラスを生成する
+  var stream = navigator.mediaDevices.getUserMedia(constraints)
+  ```
+
+  - constraints(MediaTrackConstraintsクラス)
+    - audio
+      - autoGainControl: boolean
+      - channelcount: long
+      - echoCancellation: boolean
+      - latency: double
+      - noiseSuppression: boolean
+      - sampleRate: long
+      - sampleSize: long
+      - volume: double
+    - video
+      - aspectRatio:
+      - facingMode: string
+      - frameRate:
+      - width:
+      - height:
+      - resizeMode: "none" | "crop-andm-scale"
+
+    ```js
+    {
+      video: true,
+      audio: true
+    }
+    {
+      video: {
+        width: 1280, height: 720
+      },
+      audio: true
+    }
+    {
+      video: {
+        width: {
+          min: 1024
+          ideal: 1280
+          max: 1920
+        },
+        height: {
+          min: 576
+          ideal: 720
+          max: 1080
+        }
+      },
+      audio: true
+    }
+    {
+      video: {
+        width: {
+          exact: 1280
+        },
+        height: {
+          exact: 720
+        }
+      },
+      audio: true
+    }
+    ```
+
+- MediaStream
+  - getTracks(): MediaStreamが保持しているトラック（音声や映像データ）を取得する
+  - getAudioTracks(): 音声データのみ取得する
+  - getVideoTracks(): 映像データのみ取得する
+  - addTrack()
+  - removeTrack()
+  - getTrackById()
+
+- MediaStreamTrack
+  - getCapabilities()
+  - getConstraints()
+  - getSettings()
 
 ## サンプル
 
-- getUserMedia
+- [サンプル](https://webrtc.github.io/samples/)
+
+- 映像の割り当て
 
   ```html
   <!DOCTYPE html>
@@ -99,16 +179,134 @@
 
   <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
   <script>
-  async function init(e) {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      const video = document.querySelector('video');
-      video.srcObject = stream;
-    } catch (e) {
-    }
-  }
-  init(windows)
+  const constraints = {
+    audio: false,
+    video: true
+  };
+  navigator.mediaDevices.getUserMedia(constraints)
+    .then(stream => document.querySelector('video').srcObject = stream);
   </script>
   </body>
   </html>
   ```
+
+- デバイス一覧取得
+
+  ```html
+  <!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+  </head>
+  <body>
+  <div class="select">
+      <label for="audioSource">Audio input source: </label><select id="audioSource"></select>
+  </div>
+
+  <div class="select">
+      <label for="audioOutput">Audio output destination: </label><select id="audioOutput"></select>
+  </div>
+
+  <div class="select">
+      <label for="videoSource">Video source: </label><select id="videoSource"></select>
+  </div>
+
+  <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+  <script>
+    function gotDevices(deviceInfos) {
+      const dics = {
+        'audioinput' : audioInputSelect,
+        'audiooutput': audioOutputSelect,
+        'videoinput' : videoSelect
+      };
+      for (let [kind, selectObj] of Object.entries(dics)) {
+        deviceInfos
+        .filter(d => d.kind === kind)
+        .map(function(d){
+          const option = document.createElement('option');
+          option.text = d.label || `microphone ${audioInputSelect.length + 1}`;
+          option.value = d.deviceId;
+          selectObj.appendChild(option);
+        });
+      }
+      selectors.forEach((select, selectorIndex) => {
+        if (Array.prototype.slice.call(select.childNodes).some(n => n.value === values[selectorIndex])) {
+          select.value = values[selectorIndex];
+        }
+      });
+    }
+
+    navigator.mediaDevices.enumerateDevices()
+      .then(gotDevices)
+      .catch(handleError);
+  </script>
+  </body>
+  </html>
+  ```
+
+- コネクションの確立（シグナリングを使用しないローカル版）
+
+  ```html
+  <!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+  </head>
+  <body>
+  <div id="container">
+      <video id="leftVideo" playsinline controls muted></video>
+      <video id="rightVideo" playsinline autoplay controls></video>
+  </div>
+
+  <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+  <script>
+  navigator.mediaDevices.getUserMedia({audio: true, video: true});
+    .then(stream => document.querySelector('video#leftVideo').srcObject = stream);
+
+  let pc_local;
+  let pc_remote;
+
+  const servers = null;
+  // RTCPeerConnectionの作成
+  // 映像と音声のトラックを追加し、ICEイベントを追加しておく。
+  pc_local = new RTCPeerConnection(servers);
+  stream.getTracks().forEach(track => pc_local.addTrack(track, stream));
+  pc_local.onicecandidate = e => onIceCandidate(pc_local, e);
+
+  // ※本来は相手側の作業
+  pc_remote = new RTCPeerConnection(servers);
+  pc_remote.onicecandidate = e => onIceCandidate(pc_remote, e);
+  pc_remote.ontrack = e => { rightVideo.srcObject = e.streams[0] };
+
+  function onIceCandidate(pc, event) {
+    // ※相手に送る必要がある
+    getOtherPc(pc).addIceCandidate(event.candidate)
+        .then(
+            () => console.log(`${getName(pc)} addIceCandidate success`),
+            err => console.log(`${getName(pc)} failed to add ICE Candidate: ${error.toString()}`)
+        );
+  }
+
+  const offerOptions = {
+    offerToReceiveAudio: 1,
+    offerToReceiveVideo: 1
+  };
+  pc_local.createOffer(offerOptions)
+    .then(desc => {
+      pc_local.setLocalDescription(desc, () => {}, () => {});
+      // ※相手に送る必要がある
+      pc_remote.setRemoteDescription(desc, () => {}, () => {});
+      pc_remote.createAnswer(onCreateAnswerSuccess, () => {});
+    });
+
+  function onCreateAnswerSuccess(desc) {
+    pc_remote.setLocalDescription(desc, () => {}, () => {});
+    // ※相手に送る必要がある
+    pc_local.setRemoteDescription(desc, () => {}, () => {});
+  }
+  </script>
+  </body>
+  </html>
+  ```
+
+
