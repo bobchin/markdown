@@ -15,11 +15,17 @@
     - Notary
     - Kubernetes
     - Credential Helper
+
   - Docker for Windows(Docker Toolbox): 古い？
     - Docker Engine
     - Docker Compose
     - Kubernetes
     - VirtualBox
+
+  - 違い
+    - Linuxコンテナを実行するのにホスト側にLinuxが必要になる。そのLinux(Tiny Core Linux)の実行環境が異なる。
+      - Docker Desktop: Hyper-V または WSL2 上で Tiny Core Linux
+      - Docker Toolbox: VirtualBox 上でTiny Core Linux？
 
 - 要件
   - Windows10 64bit Pro/Enterprise/Education 以上
