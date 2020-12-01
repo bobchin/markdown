@@ -1,20 +1,20 @@
 # 目次
 
-- [目次](#%E7%9B%AE%E6%AC%A1)
+- [目次](#目次)
 - [Node.js](#nodejs)
-	- [バージョンについて](#%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)
+	- [バージョンについて](#バージョンについて)
 	- [nodebrew(Mac)](#nodebrewmac)
 	- [nodist(Windows)](#nodistwindows)
 		- [nvmw(Node Version Manager for Windows)](#nvmwnode-version-manager-for-windows)
 	- [nvm](#nvm)
 	- [for twitterbootstrap](#for-twitterbootstrap)
-- [使い方](#%E4%BD%BF%E3%81%84%E6%96%B9)
-	- [モジュール](#%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB)
+- [使い方](#使い方)
+	- [モジュール](#モジュール)
 	- [exports](#exports)
 	- [npm (Node Packaged Modules)](#npm-node-packaged-modules)
-- [デバッグ](#%E3%83%87%E3%83%90%E3%83%83%E3%82%B0)
+- [デバッグ](#デバッグ)
 	- [VSCode](#vscode)
-- [おすすめモジュール](#%E3%81%8A%E3%81%99%E3%81%99%E3%82%81%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB)
+- [おすすめモジュール](#おすすめモジュール)
 
 
 # Node.js
@@ -123,12 +123,22 @@ nodist dist
 
 # インストール
 nodist + v0.12.0
+nodist add v0.12.0
 
 # 削除
 nodist - v0.8.0
+nodist rm v0.8.0
 
 # globalにする
 nodist v0.12.0
+
+# npm のバージョンを合わせる
+# https://nodejs.org/ja/download/releases/ らへんでnodeとnpmの対応バージョンを確認する
+nodist npm match
+
+# npm のグローバルモジュールの表示
+# グローバルモジュールは %NODE_PATH% に入る
+npm ls -g --depth 0
 ```
 
 ### nvmw(Node Version Manager for Windows)
