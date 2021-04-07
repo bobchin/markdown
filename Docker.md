@@ -1,7 +1,31 @@
 # Dockerについて
 
 - [Docker](https://www.docker.com/)
+- [Docker Docs](https://docs.docker.com/)
 - [Docker ToolBox](https://docs.docker.com/toolbox/overview/)
+
+## アーキテクチャ
+
+- クライアント・サーバ構造
+  - Docker daemon(dockerd): Docker API リクエストを受けて、Docker オブジェクト（イメージ・コンテナ・ネットワーク・ボリューム等）を管理する
+  - Docker client(docker) : Docker を操作する通常の方法。Docker daemon に対して、Docker APIをリクエストするコマンド。
+  - Docker registries     : Docker image を保存する場所。ex) Docker Hub
+  - Docker objects
+    - image               : Docker container を作成するための読み込み専用のテンプレート
+    - container           : Docker image の実行可能なインスタンス
+
+## 用語
+
+- Dockerイメージ: コンテナを作成するための設計図みたいなもの
+- Dockerコンテナ: Dockerイメージを基に作成される実態。実行された状態。
+- Docker Hub: Dockerイメージを作成するためのベースとなるイメージがたくさんある？
+- Dockerホスト: Dockerコンテナを実行するサーバ。
+- DockerCompose: 単一ホストで複数コンテナを扱う場合に一括して管理できる。
+- Data Volume: ホストとDockerコンテナで共有する領域。ホストのファイルシステムをマウントするイメージ。
+- Data Volume コンテナ: Data Volumeではホストのファイルシステムに依存してしまうので、共有する領域をコンテナにする。
+- Docker Swarm: 複数ホスト（マルチホスト）を束ねてクラスタ化する
+- Docker Service: Swarm内でクラスタ内の複数のコンテナを管理する
+- Docker Stack: Swarm内で複数のServiceをまとめて管理する
 
 ## 環境構築
 
@@ -69,20 +93,6 @@ docker-machine ssh
 # /etc/docker/daemon.json
 { "insecure-registries" : ["192.168.99.100:5000"] }
 ```
-
-
-## 用語
-
-- Dockerイメージ: コンテナを作成するための設計図みたいなもの
-- Dockerコンテナ: Dockerイメージを基に作成される実態。実行された状態。
-- Docker Hub: Dockerイメージを作成するためのベースとなるイメージがたくさんある？
-- Dockerホスト: Dockerコンテナを実行するサーバ。
-- DockerCompose: 単一ホストで複数コンテナを扱う場合に一括して管理できる。
-- Data Volume: ホストとDockerコンテナで共有する領域。ホストのファイルシステムをマウントするイメージ。
-- Data Volume コンテナ: Data Volumeではホストのファイルシステムに依存してしまうので、共有する領域をコンテナにする。
-- Docker Swarm: 複数ホスト（マルチホスト）を束ねてクラスタ化する
-- Docker Service: Swarm内でクラスタ内の複数のコンテナを管理する
-- Docker Stack: Swarm内で複数のServiceをまとめて管理する
 
 ## docker-machineコマンド
 
