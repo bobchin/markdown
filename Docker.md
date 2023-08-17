@@ -2,6 +2,8 @@
 
 - [Docker](https://www.docker.com/)
 - [Docker Docs](https://docs.docker.com/)
+  - [Docker Docs 日本語](https://matsuand.github.io/docs.docker.jp.onthefly/)
+  - [Docker ドキュメント日本語化プロジェクト](https://docs.docker.jp/index.html)
 - [Docker ToolBox](https://docs.docker.com/toolbox/overview/)
 
 ## アーキテクチャ
@@ -26,6 +28,38 @@
 - Docker Swarm: 複数ホスト（マルチホスト）を束ねてクラスタ化する
 - Docker Service: Swarm内でクラスタ内の複数のコンテナを管理する
 - Docker Stack: Swarm内で複数のServiceをまとめて管理する
+
+## Getting Started
+
+```bash
+git clone https://github.com/docker/getting-started.git
+
+# コンテナイメージを作成するためには Dockerfile が必要なので作成する
+cd getting-started/app
+type nul > Dockerfile
+
+ECHO "# syntax=docker/dockerfile:1" >> .\Dockerfile
+ECHO "FROM node:18-alpine" >> .\Dockerfile
+ECHO "WORKDIR /app" >> .\Dockerfile
+ECHO "COPY . ." >> .\Dockerfile
+ECHO "RUN yarn install --production" >> .\Dockerfile
+ECHO "CMD ["node", "src/index.js"]" >> .\Dockerfile
+ECHO "EXPOSE 3000" >> .\Dockerfile
+
+# ビルドする
+docker build -t getting-started .
+
+# コンテナを実行(ブラウザでhttp://localhost:3000にアクセス)
+docker run -dp 3000:3000 getting-started
+
+# コンテナの削除
+docker ps # コンテナIDの確認
+docker stop 5669571c5cc0
+docker rm 5669571c5cc0
+
+# Docker Hubにログインし、リポジトリ(getting-started)を作成
+docker push bobchinryu/getting-started
+```
 
 ## 環境構築
 
