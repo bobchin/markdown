@@ -12,7 +12,7 @@
 
 ## ホスト環境のチェック
 
-```
+```bash
 cat > version-check.sh << "EOF"
 #!/bin/bash
 # Simple script to list version numbers of critical development tools
@@ -113,13 +113,11 @@ bash library-check.sh
 - Texinfo: ソフトウェアのドキュメント（マニュアル）を画一的に作成するためのツール
 - Xz: ファイル圧縮(.xz)
 
-
-
 ## LFS
 
-- LFS用のディスクは "/dev/sdb" 
+- LFS用のディスクは "/dev/sdb"
 
-```
+```bash
 # パーティションの作成
 fdisk /dev/sdb
 mkfs -v -t ext4 /dev/sdb1
@@ -133,13 +131,13 @@ mount -v -t ext4 /dev/sdb1 $LFS
 - 変数を忘れないようにする
   - "~/.bashrc", "/root/bashrc" に以下を記述しておく
 
-```
+```bash
 export LFS=/mnt/lfs
 ```
 
 ## ソースリストのダウンロード
 
-```
+```bash
 sudo mkdir $LFS/sources
 sudo chmod a+wt $LFS/sources
 sudo wget http://lfsbookja.sourceforge.jp/7.6.ja/wget-list
@@ -154,7 +152,7 @@ popd
 
 ## インストールディレクトリと作業ユーザの作成
 
-```
+```bash
 sudo mkdir $LFS/tools
 ln -sv $LFS/tools /
 
@@ -171,7 +169,7 @@ su - lfs
 
 ## 作業ユーザの環境設定
 
-```
+```bash
 cat > ~/.bash_profile <<"EOF"
 exec env -i HOME=$HOME TERM=$TERM PS1='\u:\w\$ ' /bin/bash
 EOF
@@ -186,15 +184,3 @@ PATH=/tools/bin:/bin:/usr/bin
 export LFS LC_ALL LFS_TGT PATH
 EOF
 ```
-
-
-
-
-
-
-
-
-
-
-
-
