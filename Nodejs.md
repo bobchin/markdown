@@ -4,6 +4,7 @@
 - [Node.js](#nodejs)
 	- [バージョンについて](#バージョンについて)
 	- [nodebrew(Mac)](#nodebrewmac)
+	- [fnw(Windows \& Mac)](#fnwwindows--mac)
 	- [nodist(Windows)](#nodistwindows)
 		- [nvmw(Node Version Manager for Windows)](#nvmwnode-version-manager-for-windows)
 	- [nvm](#nvm)
@@ -16,7 +17,6 @@
 	- [VSCode](#vscode)
 - [おすすめモジュール](#おすすめモジュール)
 
-
 # Node.js
 
 ## バージョンについて
@@ -24,14 +24,12 @@
 - 0.12.x系と6.x系
   - 一時期Node.jsが0.xの時代に開発が停滞し、io.jsというフォークが発生しバージョン1から3までできた。
     その後統合されて4.0を名乗るようになった。
-	そのため **0.12.x系は過去のバージョン** という位置づけ。
+		そのため **0.12.x系は過去のバージョン** という位置づけ。
   - 現在は10.xというのが最新のものになる。
   - バージョン体系は奇数が開発版、偶数が安定版
 	- 8.x : Maintenance
 	- 9.x : No LTS
 	- 10.x: Active
-
-
 
 ## nodebrew(Mac)
 
@@ -61,7 +59,7 @@ export PATH=$NODEBREW_ROOT/current/bin:$PATH
 
 - 操作
 
-```
+```bash
 # インストール確認
 nodebrew help
 
@@ -83,7 +81,60 @@ nodebrew uninstall v8.9.1
 ```
 
 
+## fnw(Windows & Mac)
+
+- [サイト](https://github.com/Schniz/fnm)
+- 参考
+  - [Node.jsのバージョン管理ツールを改めて選定する【2021年】](https://qiita.com/heppokofrontend/items/5c4cc738c5239f4afe02)
+  - [Node.jsのバージョン管理ツールとは](https://qiita.com/heppokofrontend/items/1746c73a34d59b124013)
+	- [fnm（Fast Node Manager）の導入方法](https://zenn.dev/kazuma_r5/articles/cd5eaf3d8b5b9f)
+- nodistのアンインストール
+  - 現在のバージョン
+    - 14.17.3
+    - 11.13.0
+  - 環境変数の削除
+    - NODIST_PREFIX
+    - NODIST_X64
+    - NODE_PATH
+  - %HOMEPATH%/.npmrc からnodistの記述を削除
+  - %PROGRAMFILES%と%PROGRAMFILES(X86)%からnodistインストール先フォルダの削除
+  - %APPDATA%からnpm-cacheフォルダを削除
+
+- fnmインストール
+  - [Node.jsバージョン管理ツール「fnm」のインストール方法と使い方](https://qiita.com/heppokofrontend/items/fe1c3bc41a0ae943c2ca?0)
+  - Chocolateyインストール
+    - [Chocolatey](https://chocolatey.org/)
+    - [Markdown Chocolatey](./chocolatey.md)
+
+			```cmd
+			# インストール
+			choco install fnm -y
+
+			# 有効化(%HOMEPATH%/Documents/(Windows)PowerShell/Microsoft.PowerShell_profile.ps1 に追記)
+			fnm env --use-on-cd | Out-String | Invoke-Expression
+
+			# Nodeインストール
+			fnm isntall 14
+			fnm use 14.18.1
+			```
+
+	- コマンドプロンプト対応
+
+			```cmd
+			reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Command Processor" /v AutoRun /t "REG_SZ" /d "call c:%HOMEPATH%\.cmdrc.cmd" /f
+
+			# c:%HOMEPATH%\.cmdrc.cmd
+			@ECHO OFF
+			IF "%FNM_SETUP%"=="True" (
+					EXIT /b
+			)
+			SET FNM_SETUP=True
+			FOR /f "tokens=*" %%z IN ('fnm env --use-on-cd') DO CALL %%z
+			```
+
 ## nodist(Windows)
+
+__※duplicated!__
 
 Windows 専用の node.js バージョン管理ツール
 nvmwよりいいらしいのでこちらを使う。
