@@ -4,6 +4,7 @@
   - [ドキュメント等](#ドキュメント等)
   - [Raspbian インストール](#raspbian-インストール)
     - [Raspbian 設定](#raspbian-設定)
+  - [SSD起動](#ssd起動)
   - [デバイス関連](#デバイス関連)
   - [リモート管理](#リモート管理)
   - [momo(WebRTC)](#momowebrtc)
@@ -234,6 +235,36 @@
     ```bash
     sudo iw dev wlan0 set power_save off
     ```
+
+## SSD起動
+
+- 古いラズパイではSSD起動できるようになっていない。
+  これはブートローダの機能によるものなので、バージョンアップが必要になる。
+  バージョンが、**2020-09-03** 以降であればSSD起動できるようだ。
+  確認は一旦 SD カードにRaspberryPi OS をインストールして試す。
+
+  ```bash
+  # ブートローダのバージョン確認
+  vcgencmd bootloader_bersion
+
+  # ブートローダのアップデート方法
+  # sudo rpi-eeprom-update
+  # sudo rpi-eeprom-update -r # 元に戻す
+  # 最近は、raspi-config で設定できるよう。
+  sudo raspi-config
+  > Advanced Options -> A7 Boot ROM
+
+  # ブート順の設定(raspi-config)
+  sudo raspi-config
+  > Advanced Options -> A6 Boot Order
+  ```
+
+- SSDにデータをコピー
+  既に動作しているRaspi OS をコピーするのは簡単。
+  "SD Card Copier" を使用する。
+  ※使用するSSDはフォーマットされるので注意。
+
+  - または、Raspberry Pi Imager を使ってもいい
 
 ## デバイス関連
 
