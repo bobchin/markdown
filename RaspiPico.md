@@ -10,6 +10,7 @@
     - [Button](#button)
     - [PWM](#pwm)
     - [ADC](#adc)
+    - [NeoPixel](#neopixel)
     - [PIO](#pio)
 
 ## 参考
@@ -164,6 +165,70 @@ Analog-to-digital converter
 - 電流
   - $ 3.3V / 10kΩ = 0.3mA $
 
+### NeoPixel
+
+- LED 1 個は、WS2812 というものを使っている。
+- 信号線は 1 本のみで、24 ビット(GRB の順で、8 ビットずつ。8\*3=24)のデータを渡す。
+- 1ビットのデータは、デューティ比で指定する
+  - データ転送レート = 800kbps(1ビット当たり1250ns)
+  - 0    : Highのパルス幅:220ns~380ns  => 220/1250 = 0.176 ~  380/1250 = 0.304
+  - 1    : Highのパルス幅:580ns~1000ns => 580/1250 = 0.464 ~ 1000/1250 = 0.800
+  - reset: Lowを250μs以上つづけるとデータリフレッシュ
+
+- データ順
+
+  | 0   | 1   | 2   | 3   | 4   | 5   | 6   | 7   | 0   | 1   | 2   | 3   | 4   | 5   | 6   | 7   | 0   | 1   | 2   | 3   | 4   | 5   | 6   | 7   |
+  | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- |
+  | G7  | G6  | G5  | G4  | G3  | G2  | G1  | G0  | R7  | R6  | R5  | R4  | R3  | R2  | R1  | R0  | B7  | B6  | B5  | B4  | B3  | B2  | B1  | B0  |
+
+```python
+# Pico Python SDK Sample
+import array, time
+from machine import Pin
+import rp2
+
+UM_LEDS = 8
+
+@rp2.asm_pio(sideset_init=rp2.PIO.OUT_LOW, out_shiftdir=rp2.PIO.SHIFT_LEFT, autopull=True, pull_thresh=24)
+def ws2812():
+  T1 = 2
+  T2 = 5
+  T3 = 3
+  wrap_target()
+  label("bitloop")
+  out(x, 1)             .side(0) [T3 - 1]
+  jmp(not_x, "do_zero") .side(1) [T1 - 1]
+  jmp("bitloop")        .side(1) [T2 - 1]
+  label("do_zero")
+  nop()                 .side(0) [T2 - 1]
+  wrap()
+
+sm = rp2.StateMachine(0, ws2812, freq=8_000_000, sideset_base=Pin(22))
+sm.active(1)
+
+# 2bitゼロ埋めしておく
+ar = array.array("I", [0 for _ in range(NUM_LEDS)])
+
+# Cycle colours.
+for i in range(4 * NUM_LEDS):
+  for j in range(NUM_LEDS):
+    r = j * 100 // (NUM_LEDS - 1)
+    b = 100 - j * 100 // (NUM_LEDS - 1)
+    if j != i % NUM_LEDS:
+      r >>= 3
+      b >>= 3
+    ar[j] = r << 16 | b
+  sm.put(ar, 8)
+  time.sleep_ms(50)
+
+# Fade out.
+for i in range(24):
+  for j in range(NUM_LEDS):
+    ar[j] >>= 1
+  sm.put(ar, 8)
+  time.sleep_ms(50)
+```
+
 ### PIO
 
 - [Interface 2021 年 8 月号](https://interface.cqpub.co.jp/magazine/202108/)
@@ -171,16 +236,31 @@ Analog-to-digital converter
 - [](https://qiita.com/fude-t/items/d2baf1c98ba807273dcf)
 - [初めの一歩！ラズパイ Pico マイコン ×Python で L チカ入門](https://www.zep.co.jp/utaguchi/article/z-picoled_all-da1/)
 
+- できること
+
+  - GPIO の値の読み書き
+  - GPIO の方向の変更
+  - 割り込み
+  - DMA データ要求信号
+  - FIFO の読み書き
+  - デクリメント
+  - ビットシフト
+  - ビット反転
+  - アドレスジャンプ
+  - 待機（ウェイト）
+
 - 構造
 
   - ２つの PIO ＋それぞれに４つのステートマシン
   - PIO
     - ステートマシン x4: CPU みたいなもの
       - OSR(Out Shift レジスタ)
+        - ※出力レジスタ（CPU 側からみて出力なので）。PIO としてみるとデータが入ってくる。
       - ISR(In Shift レジスタ)
+        - ※入力レジスタ（CPU 側からみて入力なので）。PIO としてみるとデータを出す。
       - Scratch X: スクラッチレジスタ X
       - Scratch Y: スクラッチレジスタ Y
-        - 上記レジスタはすべて32ビット
+        - 上記レジスタはすべて 32 ビット
       - PC(Program Counter): プログラムカウンタ
       - Clock Div: クロック分周器
       - Control Logic
@@ -188,10 +268,11 @@ Analog-to-digital converter
       - 1FIFO は 32 ビット。
       - TX FIFOx4: PULL 命令で、TX FIFO => OSR の方向にデータ転送される
       - RX FIFOx4: PUSH 命令で、ISR => RX FIFO の方向にデータ転送される
+      - ※設定で TX または RX のどちらかに全部を割り当てることができる
     - 命令メモリ
       - 32 命令を 4 つのステートマシンで共有
-      - 1 命令は、16 ビット。
-    - I/O マッピング : PIO と Pin を対応付けする
+      - 1 命令は、16 ビット。全体は、32（命令数） \* 16 ビット(2 バイト) = 64 バイト
+    - I/O マッピング : PIO と Pin を対応付けする。３つの方法がある。
       - out pins : 出力 Pin と対応付け
       - in pins : 入力 Pin と対応付け
       - side-set pins: サイドセットピンとして出力 Pin を対応付け
@@ -212,9 +293,9 @@ Analog-to-digital converter
   | SET  |  1  |  1  |  1  |  >  |  >  |  >  |  >  | Delay/Side-Set |  >  |  >  | Destination |  >  |  >  |  >  |  >  |   Data    |
 
   - 遅延とサイドセット
-    - 両方で5ビット使える
-    - サイドセットPinを使わない場合は、すべて遅延に回せるので、$ 2^5 = 32 $ で31サイクルまで遅延できる
-      サイドセットPinを2個使う場合は、残り$ 2^3 = 8 $ で7サイクルまで遅延できることになる。
+    - 両方で 5 ビット使える
+    - サイドセット Pin を使わない場合は、すべて遅延に回せるので、$ 2^5 = 32 $ で 31 サイクルまで遅延できる
+      サイドセット Pin を 2 個使う場合は、残り$ 2^3 = 8 $ で 7 サイクルまで遅延できることになる。
 
 - 勘所
 
@@ -229,63 +310,318 @@ Analog-to-digital converter
     - 分割数 = クロック周波数 / (ビットレート \* 1bit あたりのクロックサイクル数)
 
   - クロック分周
+
     - クロック周波数をいくつかに分けて、周波数を下げる
 
   - 1 ワード = 32bit
 
   - サイクル数
-    - 周波数2000Hzの場合、1サイクルは $ 1/2000 = 500μs $
-    - 0.5s にする場合のサイクル数は、$ 0.5s / 0.0005(500μs) = 1000サイクル $
-    - x[Hz] の場合、t[s]のサイクル数 => $ x * t $
 
-```python
-from machine import Pin
-import rp2
+    - 周波数 2000Hz の場合、1 サイクルは $ 1/2000 = 500μs $
+    - 0.5s にする場合のサイクル数は、$ 0.5s / 0.0005(500μs) = 1000 サイクル $
+    - x[Hz] の場合、t[s]のサイクル数 => $ x \* t $
 
-# アセンブリ命令＝初期設定を引数で指定する
-@rp2.asm_pio(sideset_init=rp2.PIO.OUT_LOW, out_shiftdir=rp2.PIO.SHIFT_LEFT, autopull=True, pull_thresh=24)
-def ws2812():
-    T1 = 2
-    T2 = 5
-    T3 = 8
-    wrap_target()                               # 開始
-    label("bitloop")                            # ラベルbitloopを作成
-    out(x, 1)              .side(0)    [T3 - 1] # OSR から汎用レジスタX に 1bit シフトアウト
-    jmp(not_x, "do_zero")  .side(1)    [T1 - 1] # 汎用レジスタX が0ならdo_zeroにジャンプ
-    jmp("bitloop")         .side(1)    [T2 - 1] # ラベルbitloopへジャンプ
-    label("do_zero")                            # ラベルdo_zeroを作成
-    nop()                  .side(0)    [T2 - 1] #
-    wrap                                        # 終了
+  - 1 サイクルで指定できる処理
 
-# @rp2.asm_pio
-# out_init, set_init, sideset_init: out, set命令やサイドセットで使うピンの初期状態を指定する
-#   rp2.PIO_IN_LOW | rp2.PIO_IN_HIGH, rp2.PIO_OUT_LOW | rp2.PIO_OUT_HIGH,
-#   最大５つ指定でき、タプルで指定。
-# in_shiftdir, out_shiftdir: ISR, OSR がシフトする方向を指定(rp2.PIO.SHIFT_LEFT | rp2.PIO.SHIFT_RIGHT)
-#   PIO.SHIFT_LEFT : 左にシフト＝最下位ビットからデータが入り、最上位ビットを破棄
-#   PIO.SHIFT_RIGHT: 右にシフト＝最上位ビットからデータが入り、最下位ビットを破棄
-# push_thresh, pull_thresh: 自動プッシュ｜自動プル が起きるしきい値をビット数で指定
-# autopush, autopull: 自動プッシュ | 自動プルを有効にするかどうか
-# fifo_join: FIFOを、TX:RX = 4:4（PIO.JOIN_NONE） | 8:0（PIO.JOIN_TX） | 0:8（PIO.JOIN_RX） にする
+    1. 命令の実行
+    2. サイドセット = 特定の GPIO ピンの状態を変更
+    3. ディレイ
 
-```
+  - 自動プルと自動プッシュ
 
-- 命令
-  - wrap_target(): PIO の開始
-  - warp() : PIO の終了
-  - label(label) : ラベルの定義
-  - word(instr, label=None)
-  - jmp(label)
-  - jmp(copnd, label)
-  - wait(polarity, src, index)
-  - in\_(src, bit_count) : src から InShiftRegister(ISR)にシフトする
-  - out(dest, bit_count) : OutShiftRegister(OSR)から dest にシフトする
-  - push(...)
-  - pull(...)
-  - mov(dest, src)
-  - irq(index)
-  - irq(mode, index)
-  - set(dest, data)
-  - nop()
-  - .side(value) : サイドセットピンに値をセット
-  - .delay(value) :
+    - 自動プル
+      OUT()によってビットシフトする際に、シフト数が事前に指定したビット数を超えた場合に
+      自動的に TX FIFO => OSR にデータをロードする
+
+    - 自動プッシュ
+      IN()によってビットシフトする際に、シフト数が事前に指定したビット数を超えた場合に
+      自動的に ISR => RX FIFO にデータをロードする
+
+- 命令（micro python）
+
+  - オペランド
+
+    | 指定値 | 説明                                                      |
+    | :----- | :-------------------------------------------------------- |
+    | x      | スクラッチレジスタ x                                      |
+    | y      | スクラッチレジスタ y                                      |
+    | pins   | I/O マッピングで割り当てた GPIO ピン                      |
+    | pndirs | I/O マッピングで割り当てた GPIO ピンの方向                |
+    | osr    | 出力シフトレジスタ                                        |
+    | isr    | 入力シフトレジスタ                                        |
+    | pc     | プログラムカウンタ。指定したアドレスにジャンプ            |
+    | exec   | 次実行命令                                                |
+    | null   | OUT 命令の場合副作用のみ実行。IN 命令の場合定数ゼロを返す |
+
+  - 命令の分岐
+
+    - label(label) : ラベルの定義
+      疑似命令（cycle 消費しない）
+    - jmp(label)
+    - jmp(cond, label)
+
+      - cond
+
+        | 指定値   | 説明                                                         |
+        | :------- | :----------------------------------------------------------- |
+        | None     | 無条件分岐                                                   |
+        | not_x    | x レジスタがゼロなら分岐                                     |
+        | x_dec    | x レジスタがゼロでないなら、x レジスタをデクリメントして分岐 |
+        | not_y    | y レジスタがゼロなら分岐                                     |
+        | y_dec    | y レジスタがゼロでないなら、x レジスタをデクリメントして分岐 |
+        | x_not_y  | x レジスタと y レジスタが等しくないなら分岐                  |
+        | not_osre | 出力レジスタが High なら分岐(not osr empty)                  |
+
+  - 処理待ち
+
+    - wait(polarity, src, index)
+      - polarity: 0|1 指定した値になるのを待つ
+      - src : gpio(ピン番号)|pin(I/O マッピングのビット位置)|irq(IRQ 番号)
+      - index : チェックするピンまたはビット
+
+  - レジスタ処理
+
+    - in\_(src, bit_count)
+      src で指定したレジスタの値を bit_count シフトして、ISR に書き込む
+      src: pins|x|y|null|isr|osr
+    - out(dest, bit_count) : OutShiftRegister(OSR)から dest にシフトする
+      OSR の値を bit_count シフトして、dest で指定したレジスタに書き込む
+      dest: pins|x|y|null|pindirs|pc|isr|exec
+    - push(flag1, flag2)
+      ISR の値を RX FIFO に書き込んで、ISR をクリアする。
+    - pull(flag1, flag2)
+      TX FIFO から OSR に 32 ビット書き込む。
+    - mov(dest, src)
+      src から dest にデータをコピー
+      src : pins|x|y|null|status|isr|osr
+      dest: pins|x|y|exec|pc|isr|osr
+
+  - 割り込み
+
+    - irq(mod, index)
+      - mod:
+        - 0x40 or clear : フラグをクリア
+        - 0x00 or 未指定 : フラグをセット
+        - 0x20 : 1 にセットしたフラグが 0 になるまでストール
+      - index: 割り込み番号
+
+  - 値書き込み
+
+    - set(dest, data)
+      dest に data を書き込む
+      dest: pins|x|y|pindirs
+
+  - 何もしない
+
+    - nop()
+      単純に 1cycle 消費。mov(y, y) と等価
+
+  - ラッピング
+    疑似命令（cycle 消費しない）。ループを記述する場合 jmp()も使えるが、1cycle 消費するためそれを避けるのに使う。
+    wrap_target() から warp() までがループする。
+    - wrap_target(): ラッピング の開始
+    - warp() : ラッピング の終了
+
+- example
+
+  - プログラム構造サンプル
+
+    ```python
+    # モジュールの読み込み
+    from machine import Pin
+    import rp2
+
+    # asm_pioデコレータでアセンブラ関数を定義
+    @rp2.asm_pio(set_init=rp2.PIO.OUT_LOW)
+    def blink_led():
+      # ここからアセンブリで記述する
+
+    # ステートマシンのインスタンス化
+    sm = rp2.StateMachine(0, blink_led, freq=2000, set_base=Pin(25))
+
+    # ステートマシンの開始と停止
+    sm.active(1)
+    sm.active(0)
+    ```
+
+  - LED 表示
+
+    ```python
+    # 初期バージョン版 ######################################################################
+    from machine import Pin
+    import rp2
+    import time
+
+    @rp2.asm_pio(set_init=rp2.PIO.OUT_LOW)
+    def blink_led():
+      set(pins, 1)  # led_pin を割り当ててているので、それをHighにする。命令のみなので1cycle。
+      set(pins, 0)  # led_pin を割り当ててているので、それをLowにする。命令のみなので1cycle。
+
+    led_pin = Pin("LED", Pin.OUT)
+    # ステートマシン0にblink_ledを実行させる。周波数=2000Hz(1cycle = 1/2000sec = 500μsec)
+    sm = rp2.StateMachine(0, blink_led, set_base=led_pin, freq=2000)
+
+    # 5秒実行。
+    # ただし、blink_ledは1cycleごとにHighとLowを繰り返すので見えないはず。
+    sm.active(1)
+    time.sleep(5)
+    sm.active(0)
+    #########################################################################################
+    ```
+
+    ```python
+    # 改良バージョン版 #######################################################################
+    from machine import Pin
+    import rp2
+    import time
+
+    @rp2.asm_pio(set_init=rp2.PIO.OUT_LOW)
+    def blink_led():
+      wrap_target()
+      set(pins, 1) [19] # 命令1cycle + 31cycle遅延 = 20cycle
+      nop()        [31] # 命令1cycle + 31cycle遅延 = 32cycle
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31] # 32cycleを15回繰り返しているので、32*15 = 480cycle
+      # ここまで、20+480=500cycle(250msec=500/2000)
+      set(pins, 0)
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      nop()        [31]
+      wrap()
+
+    led_pin = Pin("LED", Pin.OUT)
+    sm = rp2.StateMachine(0, blink_led, set_base=led_pin, freq=2000)
+
+    # 5秒実行。
+    # ただし、blink_ledは500cycle(250msec)ごとにHighとLowを繰り返す。
+    sm.active(1)
+    time.sleep(5)
+    sm.active(0)
+    #########################################################################################
+    ```
+
+    ```python
+    # 改良バージョンジャンプ版 ################################################################
+    from machine import Pin
+    import rp2
+    import time
+
+    @rp2.asm_pio(set_init=rp2.PIO.OUT_LOW)
+    def blink_led():
+      set(pins, 1)                  # 命令1cycle
+      set(x, 14)              [18]  # 命令1cycle + 18cycle遅延 = 19cycle。スクラッチレジスタx にカウントをセット。
+      label('loop_high')            # ラベルをセット ※cycleを食わない
+      jmp(x_dec, 'loop_high') [31]  # 命令1cycle + 31cycle遅延 = 32cycle。ループで0～14まで15回実行するので、32*15=480cycle
+                                    # 1+19+480=500cycle(500/2000=250msec)
+      set(pins, 0)
+      set(x, 14)              [18]
+      label('loop_low')
+      jmp(x_dec, 'loop_low')  [31]
+
+    led_pin = Pin("LED", Pin.OUT)
+    sm = rp2.StateMachine(0, blink_led, set_base=led_pin, freq=2000)
+
+    # 5秒実行。
+    # ただし、blink_ledは480cycle(240msec)ごとにHighとLowを繰り返す。
+    sm.active(1)
+    time.sleep(5)
+    sm.active(0)
+    #########################################################################################
+    ```
+
+  - RGB LED(NeoPixel)
+
+    ```python
+    from machine import Pin
+    import rp2
+
+    # アセンブリ命令＝初期設定を引数で指定する
+    #  サイドセットは初期値LOW
+    #  OUT命令のシフトは左方向
+    #  自動プルを有効にし、24ビットで自動実行
+    @rp2.asm_pio(sideset_init=rp2.PIO.OUT_LOW, out_shiftdir=rp2.PIO.SHIFT_LEFT, autopull=True, pull_thresh=24)
+    def ws2812():
+        # T3 cycle(0.125*8 = 1μs) LOWにする
+        # T1 cycle(0.125*2 = 0.25μs) HIGHにしてウェイト
+        # x=High: T2 cycle(0.125*5 = 0.625μs) HIGHにしてウェイト => 00000000 11 11111 => H: 7/15(0.875μs) L:  8/15(1μs)
+        # x=Low : T2 cycle(0.125*5 = 0.625μs) LOW にしてウェイト => 00000000 11 00000 => H: 2/15(0.25μs)  L: 13/15(1.625μs)
+        T1 = 2
+        T2 = 5
+        T3 = 8
+        wrap_target()                               # ループ開始（T指定しているのでそこを避けるのに使用している？）
+        label("bitloop")                            # ラベルbitloopを作成
+        out(x, 1)              .side(0)    [T3 - 1] # OSR から汎用レジスタX に 1bit 左にシフトアウト。サイドセットに指定したGPIOをLOWに。T3 = 8 cycleウェイト
+        jmp(not_x, "do_zero")  .side(1)    [T1 - 1] # 汎用レジスタX が0ならdo_zeroにジャンプ。サイドセットに指定したGPIOをHIGHに。T1 = 2 cycleウェイト
+        jmp("bitloop")         .side(1)    [T2 - 1] # 汎用レジスタX が1なら、サイドセットに指定したGPIOをHIGHに。T2 = 5 cycleウェイトして、bitloopへジャンプ
+        label("do_zero")                            # ラベルdo_zeroを作成
+        nop()                  .side(0)    [T2 - 1] # サイドセットに指定したGPIOをLOWに。T2 = 5 cycleウェイト
+        wrap                                        # ループ終了
+
+    # 周波数=8MHz(1cycle 125ns=0.125μs)
+    class myNeopixel:
+      def __init__(self, num_leds, pin, delay_ms=1):
+        self.state_machine = 0
+        self.sm = rp2.StateMachine(self.state_machine, ws2812, freq=8_000_000, sideset_base=Pin(pin))
+        self.sm.active(1)
+        self.num_leds = num_leds
+        self.delay_ms = delay_ms
+        self.brightnessvalue = 255
+
+    # LED1個分のカラーデータを作成する
+    # 明るさは値のパーセンテージで指定する
+    def set_pixel(self, pixel_num, r, g, b):
+        blue  = round(b * (self.brightness() / 255))
+        red   = round(r * (self.brightness() / 255))
+        green = round(g * (self.brightness() / 255))
+
+        # G,R,B の順で8*3=24ビットデータにする
+        self.pixels[pixel_num] = blue | red << 8 | green << 16
+
+    # 明るさを考慮したデータをセットする
+    def fill(self, r, g, b):
+        for i in range(self.num_leds):
+            self.set_pixel(i, r, g, b)
+        time.sleep_ms(self.delay_ms)
+
+    # TX FIFOに書き込む
+    # FIFO は32ビットのため、先頭8ビットをシフトして以降24ビットを書き込む
+    def show(self):
+        for i in range(self.num_leds):
+            self.sm.put(self.pixels[i],8)
+        time.sleep_ms(self.delay_ms)
+
+    # @rp2.asm_pio
+    # out_init, set_init, sideset_init: out, set命令やサイドセットで使うピンの初期状態を指定する
+    #   rp2.PIO_IN_LOW | rp2.PIO_IN_HIGH, rp2.PIO_OUT_LOW | rp2.PIO_OUT_HIGH,
+    #   最大５つ指定でき、複数の場合はタプルで指定。
+    # in_shiftdir, out_shiftdir: ISR, OSR がシフトする方向を指定(rp2.PIO.SHIFT_LEFT | rp2.PIO.SHIFT_RIGHT)
+    #   PIO.SHIFT_LEFT : 左にシフト＝最下位ビットからデータが入り、最上位ビットを破棄
+    #   PIO.SHIFT_RIGHT: 右にシフト＝最上位ビットからデータが入り、最下位ビットを破棄
+    # push_thresh, pull_thresh: 自動プッシュ｜自動プル が起きるしきい値をビット数で指定
+    # autopush, autopull: 自動プッシュ | 自動プルを有効にするかどうか
+    # fifo_join: FIFOを、TX:RX = 4:4（PIO.JOIN_NONE） | 8:0（PIO.JOIN_TX） | 0:8（PIO.JOIN_RX） にする
+    ```
