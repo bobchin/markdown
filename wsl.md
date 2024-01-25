@@ -12,6 +12,7 @@
 - [とほほのWSL入門](https://www.tohoho-web.com/ex/wsl.html)
 - [WSL の基本的なコマンド](https://learn.microsoft.com/ja-jp/windows/wsl/basic-commands)
 - [WSL / WSL 2 をコマンドラインでインストールする](https://qiita.com/moriai/items/850ee91d60edc91e7b7e)
+- [Linuxを手軽に動かしたい！　Windows標準機能の「WSL2」がお薦め](https://xtech.nikkei.com/atcl/nxt/column/18/02647/111500001/)
 
 ## インストール
 
@@ -57,3 +58,25 @@
   ```PowerShell
   wsl ls -la
   ```
+
+- zsh インストール
+
+  ```sh
+  $ sudo apt install zsh
+  $ zsh --version
+  $ chsh -s $(which zsh)
+  ```
+
+  - [Oh my zsh](https://ohmyz.sh/)
+
+    ```sh
+    # curl
+    $ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    # wget
+    # sh -c "$(wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
+
+    # テーマ変更
+    # ~/.zshrc
+    # ZSH_THEME="robbyrussell"
+    ZSH_THEME="dpoggi"
+    ```
