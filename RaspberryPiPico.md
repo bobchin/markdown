@@ -44,20 +44,78 @@
   - [Download](https://www.arduino.cc/en/software)
 
 - 開発するマイコン(RP2040)に対応したボードマネージャをインストール
+  - "ファイル"-"基本設定"-"追加のボードマネージャのURL" に追加
+    - https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
+
   - 左ペインの「BOARDS MANAGER」か "ツール"=>"ボード"=>"ボードマネージャ" を開く
-  - "rp2040" で検索
+  - "pico" で検索
     - Arduino Mbed OS RP2040 Boards: 公式ライブラリ
     - Raspberry Pi Pico/RP2040: 非公式
-      - <https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json>
-      - "ファイル"-"基本設定"-"追加のボードマネージャのURL" に追加
-      - ボードマネージャから "Raspberry Pi Pico/RP2040" をインストール
 
   - WIZnet W5100S-EVB-Pico の場合
-    - ボード情報を設定する
     - "ツール"-"ボード" から "Raspberry Pi Pico/RP2040"-"WIZnet W5100S-EVB-Pico" を選択
 
 - ライブラリのインストール
   - 左ペインの「ライブラリマネージャ」か "ツール"-"ライブラリを管理" を開く
+
+- uf2ファイルを書き込めるようにする
+  - [Arduino-Pico](https://arduino-pico.readthedocs.io/en/latest/install.html)
+    - [Install](https://arduino-pico.readthedocs.io/en/latest/install.html)
+      - 初回書き込み時は、BOOTSELボタンを押しながら起動し、ファイル書き込みモードにしてから書き込む。
+        - ツール - ポート で "UF2 Board" を選択してアップロードする。（ビルトインROM ブートローダを使う）
+        - 以降はCOMポートを指定する
+    - [LittleFS](https://github.com/earlephilhower/arduino-pico-littlefs-plugin/blob/master/README.md)
+      - [arduino-littlefs-upload](https://github.com/earlephilhower/arduino-littlefs-upload)
+        - arduino-littlefs-upload-1.0.0.vsix を "C:\Users\<username>\.arduinoIDE\plugins\" にコピーする
+
+- 有線LANを使う
+  - [Using a Static IP Address with the W5100S-EVB-Pico Board and Arduino IDE](https://maker.wiznet.io/scott/projects/using-a-static-ip-address-with-the-w5100s-evb-pico-board-and-arduino-ide/)
+  - [Ethernetライブラリ](https://github.com/WIZnet-ArduinoEthernet/Ethernet)
+    - 本家のEthernetでは固定IPが使えない？
+    - zipでダウンロードしてプロジェクトに追加
+      - スケッチ - ライブラリをインクルード - zip形式のライブラリをインストール
+        - スケッチフォルダにlibrariesフォルダが追加される
+
+  ```c
+  #include <SPI.h>
+  #include <Ethernet.h>
+
+  const csPin = 17;
+  byte mac[] = { 0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x02 };
+  IPAddress ip(192, 168, 1, 1);
+  IPAddress dns(192, 168, 1, 254);
+  IPAddress gw(192, 168, 1, 254);
+  IPAddress sub(255, 255, 255, 0);
+
+  void print_ip(char format[], IPAddress adr) {
+    Serial.printf(format, adr.toString().c_str());
+  }
+
+  void setup() {
+    Serial.begin(9600);
+    while (!Serial);
+
+    Ethernet.init(csPin);
+
+    Serial.println("Initialize Ethernet with DHCP:");
+    if (Ethernet.begin(mac) == 0) {
+      Serial.println("Failed to configure Ethernet using DHCP.");
+      Serial.println("Configuring Ethernet with a static IP address...");
+      Ethernet.begin(mac, ip, dns, gw, sub);
+    }
+
+    print_ip("My IP address: %s\n", Ethernet.localIP());
+    print_ip("Subnet mask: %s\n",   Ethernet.subnetMask());
+    print_ip("Gateway IP: %s\n",    Ethernet.gatewayIP());
+    print_ip("DNS Server IP: %s\n", Ethernet.dnsServerIP());
+
+    if (Ethernet.hardwareStatus() == EthernetNoHardware) {
+    }
+  }
+
+  void loop() {
+  }
+  ```
 
 - 本体への書き込み
   - 本体の "BOOT SEL" ボタンを押しながら、PC に USB で接続
