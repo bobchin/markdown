@@ -4,7 +4,7 @@
 - [Node.js](#nodejs)
 	- [バージョンについて](#バージョンについて)
 	- [nodebrew(Mac)](#nodebrewmac)
-	- [fnw(Windows \& Mac)](#fnwwindows--mac)
+	- [fnm(Windows \& Mac)](#fnmwindows--mac)
 	- [nodist(Windows)](#nodistwindows)
 		- [nvmw(Node Version Manager for Windows)](#nvmwnode-version-manager-for-windows)
 	- [nvm](#nvm)
@@ -81,7 +81,7 @@ nodebrew uninstall v8.9.1
 ```
 
 
-## fnw(Windows & Mac)
+## fnm(Windows & Mac)
 
 - [サイト](https://github.com/Schniz/fnm)
 - 参考
@@ -100,23 +100,53 @@ nodebrew uninstall v8.9.1
   - %PROGRAMFILES%と%PROGRAMFILES(X86)%からnodistインストール先フォルダの削除
   - %APPDATA%からnpm-cacheフォルダを削除
 
+- fnm コマンド
+
+	```cmd
+	# 環境変数表示
+	fnm env
+	fnm env --use-on-cd
+
+	# プロジェクトでnodeのバージョンを指定する
+	# プロジェクトフォルダに ".node-version" or ".nvmrc" を作成する
+	node -v
+	v14.18.1
+	node -v > .node-version
+
+	fnm list-remote		# 使用できるnodeバージョン
+	fnm list					# インストールされているバージョン
+	fnm install				# インストール
+	fnm uninstall
+	fnm use						# 使用するバージョン
+	```
+
 - fnmインストール
   - [Node.jsバージョン管理ツール「fnm」のインストール方法と使い方](https://qiita.com/heppokofrontend/items/fe1c3bc41a0ae943c2ca?0)
-  - Chocolateyインストール
-    - [Chocolatey](https://chocolatey.org/)
-    - [Markdown Chocolatey](./chocolatey.md)
+
+	- Windows
+
+		- Release Binary
 
 			```cmd
-			# インストール
-			choco install fnm -y
-
-			# 有効化(%HOMEPATH%/Documents/(Windows)PowerShell/Microsoft.PowerShell_profile.ps1 に追記)
-			fnm env --use-on-cd | Out-String | Invoke-Expression
-
-			# Nodeインストール
-			fnm isntall 14
-			fnm use 14.18.1
+			REM https://github.com/Schniz/fnm/releases から fnm-windows.zip をダウンロード
+			REM PATH の通ったところに解凍する
 			```
+
+    - Chocolateyインストール
+      - [Chocolatey](https://chocolatey.org/)
+      - [Markdown Chocolatey](./chocolatey.md)
+
+  			```cmd
+  			# インストール
+  			choco install fnm -y
+
+  			# 有効化(%HOMEPATH%/Documents/(Windows)PowerShell/Microsoft.PowerShell_profile.ps1 に追記)
+  			fnm env --use-on-cd | Out-String | Invoke-Expression
+
+  			# Nodeインストール
+  			fnm install 14
+  			fnm use 14.18.1
+  			```
 
 	- コマンドプロンプト対応
 
