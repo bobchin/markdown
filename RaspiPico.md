@@ -5,6 +5,7 @@
   - [ファームウェア](#ファームウェア)
   - [機能](#機能)
   - [Thonny](#thonny)
+  - [arduino IDE](#arduino-ide)
   - [部品](#部品)
     - [LED](#led)
     - [Button](#button)
@@ -98,6 +99,43 @@
   - 実行
     - インタプリタ設定
       - MicroPython(Raspberry Pi Pico)
+
+## arduino IDE
+
+- [オンライン](https://app.arduino.cc/)
+- [IDE](https://www.arduino.cc/en/software)
+- [ボードマネージャ](https://github.com/earlephilhower/arduino-pico)
+- [Document](https://arduino-pico.readthedocs.io/en/latest/)
+
+- 設定
+  - 言語: 日本語
+  - 追加のボードマネージャ: https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
+  - ボードの追加
+    - "ツール" - "ボード" - "ボードマネージャ" で "pico" を検索
+      - Raspberry Pi Pico/RP2040 を選択
+        ※Arduino Mbed OS RP2040 Boardsは公式のボードマネージャ
+    - ボードを選択する
+      - Raspberry Pi Pico
+      - Raspberry Pi Pico W
+      - WIZnet W5100S-EVB-Pico
+
+  - 有線LAN
+
+    ```c
+    #include <W5100lwIP.h>
+    Wiznet5100lwIP eth(17);
+
+    void setup() {
+      SPI.setRX(16);
+      SPI.setCS(17);
+      SPI.setSCK(18);
+      SPI.setTX(19);
+      eth.begin();
+      while (!eth.connected()) {
+        Serial.print(".");
+      }
+    }
+    ```
 
 ## 部品
 
