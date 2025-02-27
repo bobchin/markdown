@@ -16,6 +16,8 @@
 - 無印とSの違い
   SDカード版(ノーマル)かeMMC版(S)かの違い
 
+---
+
 - シリアルデバッグ
   - USB-UART変換を準備する
     ([SH-U09C](https://www.amazon.co.jp/DSD-TECH-SH-U09C-USB-TTL%E3%82%B7%E3%83%AA%E3%82%A2%E3%83%AB%E3%82%A2%E3%83%80%E3%83%97%E3%82%BF%E3%83%BC/dp/B07BBPX8B8?ref_=ast_sto_dp))
@@ -23,16 +25,20 @@
     Degug UART header の TxとRx を接続する
   - Putty でシリアル接続する。Baudrate = 1,500,000
 
+---
+
 - イメージの書き込み
   - [TinkerOS](https://tinker-board.asus.com/jp/download-list.html) のダウンロード
   - SDカードに書き込んで起動 by [Etcher](https://etcher.balena.io/)
     **※SDカードに書き込んで、SDから起動しないとeMMCを認識しないので注意**
   - USB Type-B mini とPCを接続するとディスク(eMMC)を認識するので、Etcherで書き込む
-    - **USB2.0**じゃないとうまく認識しない情報もあるので注意
+    - **USB2.0じゃないとうまく認識しない**情報もあるので注意
 
 - イメージのバックアップ
   - USB Type-B mini とPCを接続してディスク(eMMC)を認識する
   - [Win32DiskImager](https://win32diskimager.org/) でバックアップする
+
+---
 
 - 初回ログイン
   - パスワードの変更をする必要がある
@@ -45,23 +51,37 @@
     2. 自動的にパスワード変更するために、パスワード入力を求めるので、**初期PW** を入力
     3. 新しいパスワードに変更。新しいパスワードと再度確認パスワードを入力。
 
+---
+
+- /boot(/dev/mmcblk0p7) のサイズ拡張
+  - eMMCから起動した場合はパーティションが変更できないので、SDからOSを起動する。
+  - SD起動したOSに、"GParted" をインストールする
+
+    ```bash
+    sudo apt update
+    sudo apt install gparted
+    ```
+  - GUI からGParted を起動して、/(/dev/mmcblk0p8) を縮小し、/boot(/dev/mmcblk0p7) を拡張する
+    - ※/dev/mmcblk0 がeMMCなので注意
+    - /dev/mmcblk0p8 の Free space preceding => 448Mib
+    - /dev/mmcblk0p8 の New size => 512Mib
+
+---
+
+- Thunar で NAS にアクセス
+  - smb://172.17.1.104/docuworks を入力し、user=admin でログインする
+
+---
+
+### 以降の設定はスクリプト化しているので、内容の確認と考えてください。
+
 - 初期設定
 
-  - /boot(/dev/mmcblk0p7) のサイズが小さいので拡張する
-    - eMMCから起動した場合はパーティションが変更できないので、SDからOSを起動する。
-    - SD起動したOSに、"GParted" をインストールする
-
-      ```bash
-      sudo apt update
-      sudo apt install gparted
-      ```
-    - GUI からGParted を起動して、/(/dev/mmcblk0p8) を縮小し、/boot(/dev/mmcblk0p7) を拡張する
-      - ※/dev/mmcblk0 がeMMCなので注意
-      - /dev/mmcblk0p8 の Free space preceding => 448Mib
-      - /dev/mmcblk0p8 の New size => 512Mib
-
   - ※Debian11 Xfce のカスタマイズ
+    **~/.config/xfce4/xfconf/xfce-perchannel-xml/*.xml で設定を保持する**
+
     - 設定 - ディスプレイ => 解像度を 1920x1080 に
+
     - TinkerConfig
       - 2. Change User Password: p@ssword
       - 3. Boot Options
@@ -77,6 +97,7 @@
         - F1 SSH  => enable
         - F5 Audio
           - 1 Force HDMI
+
     - デスクトップ
       - 背景
         - 設定 - デスクトップ
@@ -87,9 +108,11 @@
             - すべてチェック外す
           - アイコン
             - アイコンタイプ: 無し
+
       - マウスカーソル
         - 設定 - マウスとタッチパッド
           ※サイズをいじると大きさが変わる？
+
       - パネル
         - 設定 - パネル
           - パネル２削除
@@ -110,6 +133,13 @@
               - PulseAudioプラグイン: 削除
               - 時計: 削除
               - アクションボタン: 再起動とシャットダウンだけにする
+
+      - キーボード
+        - ショートカット
+
+      - 電源
+        - xxx
+
     - ネットワーク
       - IPv6を無効
       - IPv4
@@ -119,56 +149,64 @@
     - セッションと起動
       - 全般
         - ログアウト時に確認する: チェック外す
+      - パネルの起動を削除
+      - セッションの保存
+
+---
 
 - overlayfs の設定
   - [Adapting Ubuntu for the Automotive: quick boot and power-loss resilience](https://medium.com/@fmntf/adapting-ubuntu-for-the-automotive-quick-boot-and-power-loss-resilience-74d25915250c)
 
-  ```bash:/sbin/overlayinit
-  #!/bin/sh
+  - /sbin/overlayinit
 
-  # コマンドが失敗するのでマウントする
-  mount -t proc none /proc
+    ```bash:/sbin/overlayinit
+    #!/bin/sh
 
-  # tmpfs(メモリをディスクとして扱う) を /media にマウント。overlayfsで使用するフォルダを作成。
-  mount -t tmpfs tmpfs /media
-  mkdir /media/root-ro
-  mkdir /media/root-rw
-  mkdir /media/overlay
-  mkdir /media/work
+    # コマンドが失敗するのでマウントする
+    mount -t proc none /proc
 
-  # ルートのマウントし直し。/dev/mmcblk0p8 を読み込み専用に
-  # overlayfs としては、
-  # - メインを    /media/root-ro => /dev/mmcblk0p8
-  # - 読み書きは  /media/root-rw
-  # - 作業は      /media/work
-  # - マウント    /media/overlay
-  umount /
-  mount -o ro /dev/mmcblk0p8 /media/root-ro
-  mount -t overlay -o lowerdir=/media/root-ro,upperdir=/media/root-rw,workdir=/media/work overlay /media/overlay
-  cd /media/overlay
-  mkdir old_root
-  pivot_root . old_root
-  exec chroot . sh -c 'exec /sbin/init'
+    # tmpfs(メモリをディスクとして扱う) を /media にマウント。overlayfsで使用するフォルダを作成。
+    mount -t tmpfs tmpfs /media
+    mkdir /media/root-ro
+    mkdir /media/root-rw
+    mkdir /media/overlay
+    mkdir /media/work
+
+    # ルートのマウントし直し。/dev/mmcblk0p8 を読み込み専用に
+    # overlayfs としては、
+    # - メインを    /media/root-ro => /dev/mmcblk0p8
+    # - 読み書きは  /media/root-rw
+    # - 作業は      /media/work
+    # - マウント    /media/overlay
+    umount /
+    mount -o ro /dev/mmcblk0p8 /media/root-ro
+    mount -t overlay -o lowerdir=/media/root-ro,upperdir=/media/root-rw,workdir=/media/work overlay /media/overlay
+    cd /media/overlay
+    mkdir old_root
+    pivot_root . old_root
+    exec chroot . sh -c 'exec /sbin/init'
+    ```
+
+- overlayfs の有効化
+
+  ```txt:/boot/cmdline.txt
+  init=/sbin/overlayinit
+  ```
+- overlayfs の無効化
+
+  ```bash
+  sudo mount /dev/mmcblk0p7 ~/boot
+  sudo vi ~/boot/cmdline.txt
   ```
 
-  - overlayfs の有効化
+  ```txt:/boot/cmdline.txt
+  # 削除
+  # init=/sbin/overlayinit
+  ```
 
-    ```txt:/boot/cmdline.txt
-    init=/sbin/overlayinit
-    ```
-  - overlayfs の無効化
+- 変更用スクリプト
 
-    ```bash
-    sudo mount /dev/mmcblk0p7 ~/boot
-    sudo vi ~/boot/cmdline.txt
-    ```
-
-    ```txt:/boot/cmdline.txt
-    # 削除
-    # init=/sbin/overlayinit
-    ```
-
-  - 変更用スクリプト
+  - change_bootmode.sh
 
     ```bash:change_bootmode.sh
     #!/bin/bash
@@ -183,18 +221,22 @@
     if [ $RET -eq 0 ]; then
       # yes
       if ! grep -q "init=/sbin/overlayinit" ${CMDLINE}; then
-        sudo sed -i ${CMDLINE} -e '$s/$/ init=\/sbin\/overlayinit/g'
+        sudo sed -i ${CMDLINE} -e '$ s/$/ init=\/sbin\/overlayinit/g'
       fi
     elif [ $RET -eq 1 ]; then
       # no
       if grep -q "init=/sbin/overlayinit" ${CMDLINE}; then
-        sudo sed -i ${CMDLINE} -e "s/ init=\/sbin\/overlayinit//"
+        sudo sed -i ${CMDLINE} -e '$ s/ init=\/sbin\/overlayinit//'
       fi
+    else
+      exit 0
     fi
 
     sudo umount ${BOOTDIR}
     sudo reboot
     ```
+
+---
 
 - 起動時の非表示化
 
@@ -202,41 +244,71 @@
   consoleblank=1 quiet
   ```
 
+- change_cmdline.sh
+
+  ```bash:change_cmdline.sh
+  #!/bin/bash
+
+  BOOTDIR=$(mktemp -d)
+  sudo mount /dev/mmcblk0p7 ${BOOTDIR}
+  CMDLINE=${BOOTDIR}/cmdline.txt
+
+  sudo sed -z -i ${CMDLINE} -e "$ s/#####\n*$/#####\n\n/g"
+  sudo sed -i ${CMDLINE} -e "$ s/$/consoleblank=1 quiet/g"
+
+  cat ${CMDLINE}
+  sudo umount ${BOOTDIR}
+  ```
+
+---
+
 - 自動起動(systemd)
   - [Grafana Kiosk Application](https://blog.rabu.me/grafana-kiosk-montiring-with-thinkboard-r2-0/)
 
-  ```bash
-  sudo systemctl enable selector.service
-  sudo systemctl status selector.service
-  ```
+    ```bash
+    sudo systemctl enable selector.service
+    sudo systemctl status selector.service
+    ```
 
-  ```bash:/etc/systemd/system/selector.service
-  [Unit]
-  Description=Selector
-  After=systemd-user-sessions.service
+  - selector.service
 
-  [Service]
-  User=linaro
-  Environment="DISPLAY=:0"
-  Environment="XAUTHORITY=/home/linaro/.Xauthority"
-  Environment="XDG_RUNTIME_DIR=/run/user/1000"
+    ```bash:/etc/systemd/system/selector.service
+    [Unit]
+    Description=Selector
+    After=systemd-user-sessions.service
 
-  # X が起動するまで待つ必要がある
-  ExecStartPre=/bin/sleep 5
+    [Service]
+    User=linaro
+    Environment="DISPLAY=:0"
+    Environment="XAUTHORITY=/home/linaro/.Xauthority"
+    Environment="XDG_RUNTIME_DIR=/run/user/1000"
 
-  WorkingDirectory=/home/linaro/selector
-  ExecStart=/home/linaro/selector/avselector
+    # X が起動するまで待つ必要がある
+    ExecStartPre=/bin/sleep 5
 
-  [Install]
-  WantedBy=graphical.target
-  ```
+    WorkingDirectory=/home/linaro/selector
+    ExecStart=/home/linaro/selector/avselector
 
-  ```bash:start_selector.sh
-  #!/bin/bash
+    [Install]
+    WantedBy=graphical.target
+    ```
 
-  cd /home/linaro/selector
-  xfce4-terminal --geometry=1x1+0+0 --hide-menubar --hide-borders --hide-toolbar --working-directory="/home/linaro/selector" -e "/home/linaro/selector/avselector"
-  ```
+  - systemctl でうまくいかない場合
+
+    ```bash:start_selector.sh
+    #!/bin/bash
+
+    cd /home/linaro/selector
+    xfce4-terminal \
+      --geometry=1x1+0+0 \
+      --hide-menubar \
+      --hide-borders \
+      --hide-toolbar \
+      --working-directory="/home/linaro/selector" \
+      -e "/home/linaro/selector/avselector"
+    ```
+
+---
 
 - node.js 環境構築
 
@@ -247,6 +319,8 @@
   node -v
   npm -v
   ```
+
+---
 
 - GPIO
   - [info](https://github.com/TinkerBoard/TinkerBoard/wiki/User-Guide#3-gpio)
@@ -335,29 +409,37 @@
     })
     ```
 
-    ```bash
-    # GPIO の有効化
-    gpio export 101 out
-    echo 1 > /sys/class/gpio/gpio101/value
-    cat /sys/class/gpio/gpio101/value
-    echo 0 > /sys/class/gpio/gpio101/value
-    cat /sys/class/gpio/gpio101/value
-    gpio unexport 101
-    ```
+  - GPIO の使い方
 
-    ```js:gpio_sample.js
-    const { execSync } = require('child_process')
-    const gpio_number = 147
-    const milisec = 1000
+    - bash
 
-    execSync(`gpio export ${gpio_number} out`)
-    execSync(`echo 1 > /sys/class/gpio/gpio${gpio_number}/value`)
+      ```bash
+      # GPIO の有効化
+      gpio export 101 out
+      echo 1 > /sys/class/gpio/gpio101/value
+      cat /sys/class/gpio/gpio101/value
+      echo 0 > /sys/class/gpio/gpio101/value
+      cat /sys/class/gpio/gpio101/value
+      gpio unexport 101
+      ```
 
-    setTimeout(() => {
-      execSync(`echo 0 > /sys/class/gpio/gpio${gpio_number}/value`)
-      execSync(`gpio unexport ${gpio_number}`)
-    }, milisec)
-    ```
+    - js
+
+      ```js:gpio_sample.js
+      const { execSync } = require('child_process')
+      const gpio_number = 147
+      const milisec = 1000
+
+      execSync(`gpio export ${gpio_number} out`)
+      execSync(`echo 1 > /sys/class/gpio/gpio${gpio_number}/value`)
+
+      setTimeout(() => {
+        execSync(`echo 0 > /sys/class/gpio/gpio${gpio_number}/value`)
+        execSync(`gpio unexport ${gpio_number}`)
+      }, milisec)
+      ```
+
+---
 
 - UART
   - UART0(/dev/ttyS0)
@@ -373,20 +455,25 @@
     - TX: 15
     - RX: 29
 
-  ```bash:/boot/config.txt
-  initf:uart0=on
-  initf:uart1=on
-  initf:uart4=on
-  initf:uart9=on
-  ```
+  - /boot/config.txt
 
-  ```bash
-  sudo apt install screen
+    ```bash:/boot/config.txt
+    initf:uart0=on
+    initf:uart1=on
+    initf:uart4=on
+    initf:uart9=on
+    ```
 
-  screen /dev/ttyS0 115200
-  # Ctrl+a Ctrl+k で終了
-  ```
+  - 使い方
 
+    ```bash
+    sudo apt install screen
+
+    screen /dev/ttyS0 115200
+    # Ctrl+a Ctrl+k で終了
+    ```
+
+---
 
 - Network
   - nmcli
@@ -395,8 +482,83 @@
       - 設定は「Connection」にまとめるイメージ。
       - 「Connection」と「Device」をマッピングすることで実際に設定が反映されるイメージ。
 
-  ```bash
-  # DHCP
-  sudo nmcli c m "有線接続\ 1" ipv4.method auto
-  ```
+  - 設定サンプル
+
+    ```bash
+    # DHCP
+    sudo nmcli c m "有線接続\ 1" ipv4.method auto
+    ```
+
+
+## 設定ファイルの場所
+
+- TinkerConfig（実際のコマンド）
+  - パスワード変更
+    - passwd linaro
+
+  - GUI 自動ログイン
+    - systemctl set-default graphical.target
+    - /etc/systemd/system/getty@tty1.service.d/override.conf の作成
+      - mkdir -p /etc/systemd/system/getty@tty1.service.d/
+      - /etc/systemd/system/getty@tty1.service.d/override.conf
+
+        ```bash
+        [Service]
+        ExecStart=
+        ExecStart=-/sbin/agetty --autologin $USER_NAME --noclear %I $TERM
+        ```
+    - /etc/lightdm/lightdm.conf の編集
+      - sed /etc/lightdm/lightdm.conf -i -e "s/^\(#\|\)autologin-user=.*/autologin-user=$USER_NAME/"
+
+  - 日本語化
+    - dpkg-reconfigure locales
+    - dpkg-reconfigure tzdata
+    - dpkg-reconfigure keyboard-configuration && invoke-rc.d keyboard-setup start
+
+- デスクトップ環境
+  - デスクトップ
+    - ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
+  - ディスプレイ
+    - ~/.config/xfce4/xfconf/xfce-perchannel-xml/display.xml
+  - マウスカーソル
+    - ~/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
+  - パネル
+    - ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml
+  - キーボード（ショートカット）
+    - ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcutsmv x.xml
+
+- ネットワーク
+  - /etc/NetworkManager/system-connections/'有線接続 1.nmconnection'
+
+    ```bash:'/etc/NetworkManager/system-connections/有線接続 1.nmconnection'
+    [connection]
+    id=有線接続 1
+    uuid=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    type=ethernet
+    autoconnect-priority=-999
+    interface-name=eth0
+    timestamp=1684395394
+
+    [ethernet]
+
+    [ipv4]
+    address1=192.168.1.1/24,192.168.1.254
+    dns=192.168.1.254
+    method=manual
+
+    [ipv6]
+    addr-gen-mode=stable-privacy
+    method=disabled
+
+    [proxy]
+    ```
+
+- タスク実行
+  - /etc/crontab
+
+    ```bash:/etc/crontab
+    # minute(0-59), hour(0-23), day(1-31), month(1-12), week(0-6)
+    0 5 * * *   root    reboot
+    ```
+
 
