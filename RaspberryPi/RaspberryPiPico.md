@@ -87,7 +87,7 @@
   IPAddress gw(192, 168, 1, 254);
   IPAddress sub(255, 255, 255, 0);
 
-  void print_ip(char format[], IPAddress adr) {
+  void print_ip(const char format[], IPAddress adr) {
     Serial.printf(format, adr.toString().c_str());
   }
 

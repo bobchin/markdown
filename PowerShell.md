@@ -3,12 +3,27 @@
 ## 参考
 
 - [https://news.mynavi.jp/itsearch/article/hardware](GUIユーザのためのPowerShell入門)
+- [入門者の教科書 ～PowerShellをイチから学ぼう～](https://cheshire-wara.com/ps-textbooks/)
+
+## 種類
+
+- Windows PowerShell
+  - Windows にプリインストールされている PowerShell
+    - Desktopエディション
+    - Coreエディション
+- PowerShell Core
+  - Windows PowerShell の Core エディションを拡張し、OSS 化を目的とした PowerShell
+- PowerShell
+  - 枝分かれしていた２つのエディションを統一
 
 ## 環境
 
 - Windows7/WinServer2008R2 以降は素でV2.0が入っている
 - WinServer2008 は「機能の追加」から追加
 - WinServer2003 はネットからダウンロードしてインストール
+- Windows PoweShell 5.1は、.NET Framework 4.5。Windows10に標準搭載
+- PoweShell 7.1 以降は、.NET 5以降が必要
+  - 追加でインストールする必要がある
 
 ## コマンドレット
 
