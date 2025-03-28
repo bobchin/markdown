@@ -289,6 +289,9 @@ for i in range(24):
 
 - 構造
 
+  ![ブロック図](http://moons.link/pico/wp-content/uploads/2023/02/block.png)
+  ![ステートマシン(SM)](http://moons.link/pico/wp-content/uploads/2023/02/sm_block.png)
+
   - ２つの PIO ＋それぞれに４つのステートマシン
   - PIO
     - ステートマシン x4: CPU みたいなもの
