@@ -271,8 +271,9 @@ for i in range(24):
 
 - [Interface 2021 年 8 月号](https://interface.cqpub.co.jp/magazine/202108/)
 - [ラズピコ PIO ～解説編～](https://moons.link/pico/post-498/)
-- [](https://qiita.com/fude-t/items/d2baf1c98ba807273dcf)
+- [Raspberry Pi Pico のProgrammable I/O (PIO)入門](https://qiita.com/fude-t/items/d2baf1c98ba807273dcf)
 - [初めの一歩！ラズパイ Pico マイコン ×Python で L チカ入門](https://www.zep.co.jp/utaguchi/article/z-picoled_all-da1/)
+- [Raspberry Pi Pico/W のPIOを調査するぞ！（PIO : Programmable I/O）](https://karakuri-musha.com/inside-technology/arduino-raspberrypi-picow-tips-piostartup01/)
 
 - できること
 
@@ -297,14 +298,21 @@ for i in range(24):
     - ステートマシン x4: CPU みたいなもの
       - OSR(Out Shift レジスタ)
         - ※出力レジスタ（CPU 側からみて出力なので）。PIO としてみるとデータが入ってくる。
+        - TX FIFO => OSR (PULL命令: TX FIFO から 32bit ワード削除して、OSR に書き込み)
+        - OSR => Pin (OUT命令: OSR から 指定したサイズ(1～32)ビットシフト)
+        - Auto Pull: 合計シフトカウントのしきい値を超えると自動的に TX FIFO から OSR に読み出す
       - ISR(In Shift レジスタ)
         - ※入力レジスタ（CPU 側からみて入力なので）。PIO としてみるとデータを出す。
+        - Pin => ISR (IN命令: 指定したサイズ(1～32)ビットを ISR にビットシフト)
+        - ISR => RX FIFO (PUSH命令: ISR から RX FIFO に書き込み)
+        - Auto Push: 合計シフトカウントのしきい値を超えると自動的に ISR から RX FIFO に書き出す
       - Scratch X: スクラッチレジスタ X
       - Scratch Y: スクラッチレジスタ Y
         - 上記レジスタはすべて 32 ビット
       - PC(Program Counter): プログラムカウンタ
       - Clock Div: クロック分周器
       - Control Logic
+        - 実行制御する
     - FIFOx8 : システム側とデータを出し入れする場所。
       - 1FIFO は 32 ビット。
       - TX FIFOx4: PULL 命令で、TX FIFO => OSR の方向にデータ転送される
@@ -463,6 +471,48 @@ for i in range(24):
     - wrap_target(): ラッピング の開始
     - warp() : ラッピング の終了
 
+  - [MicroPython での指定の仕方](https://micropython-docs-ja.readthedocs.io/ja/latest/library/rp2.html)
+
+    ```python
+    # out_init=None                 out() 命令で使用するピンの初期状態
+    # set_init=None                 set() 命令で使用するピンの初期状態
+    # sideset_init=None             .side() 命令で使用するピンの初期状態
+    # side_pindir=False             .side() 命令の指定する値の内容 False: ピンの値 True: ピンの方向
+    # in_shiftdir=PIO.SHIFT_LEFT    ISR がシフトする方向(PIO.SHIFT_LEFT|PIO.SHIFT_RIGHT)
+    # out_shiftdir=PIO.SHIFT_LEFT   OSR がシフトする方向(PIO.SHIFT_LEFT|PIO.SHIFT_RIGHT)
+    # autopush=False                自動pushの有効無効
+    # autopull=False                自動pullの有効無効
+    # push_thresh=32                自動pushが動作するしきい値（ビット数）
+    # pull_thresh=32                自動pullが動作するしきい値（ビット数）
+    # fifo_join=PIO.JOIN_NONE       8つのFIFOをどう割り振るか(PIO.JOIN_NONE=TX4+RX4|PIO.JOIN_RX=RX8|PIO.JOIN_TX=TX8)
+    @rp2.asm_pio(set_init=rp2.PIO.OUT_LOW)
+    def hoge():
+      wrap_target() # 折り返し後に開始する位置=ループの開始と考えていい
+      wrap()        # 折り返しする
+
+      label("loop_high") # label(100)
+      word()
+
+      jmp("loop_high")            # ラベルにジャンプ
+      jmp(condition, "loop_high") # 条件でジャンプ
+      # conditions:
+      # not_x, not_y: X or Y レジスタが 0 ならジャンプ
+      # x_dec, y_dec: X or Y レジスタが 0 以外でジャンプ。判定後にX or Y レジスタをデクリメント
+      # x_not_y     : X と Y レジスタが異なればジャンプ
+      # pin         : ピンが設定されていればジャンプ
+      # not_osre    : OSR が空でなければジャンプ
+
+      wait(value, src, index)     # src(GPIO)[index] が value になるまで待つ
+      in_(src, bit_count)         # src => ISR にビットシフト
+      out(dest, bit_count)        # OSR => dest にビットシフト
+      set(dest, data)             # dest に data をセット
+      push()                      # ISR => RX FIFO
+      pull()                      # TX FIFO => OSR
+      mov(src, dest)              # src を dest に移動
+      irq()
+      nop()
+    ```
+
 - example
 
   - プログラム構造サンプル
@@ -519,7 +569,7 @@ for i in range(24):
     @rp2.asm_pio(set_init=rp2.PIO.OUT_LOW)
     def blink_led():
       wrap_target()
-      set(pins, 1) [19] # 命令1cycle + 31cycle遅延 = 20cycle
+      set(pins, 1) [19] # 命令1cycle + 19cycle遅延 = 20cycle
       nop()        [31] # 命令1cycle + 31cycle遅延 = 32cycle
       nop()        [31]
       nop()        [31]
@@ -535,8 +585,8 @@ for i in range(24):
       nop()        [31]
       nop()        [31]
       nop()        [31] # 32cycleを15回繰り返しているので、32*15 = 480cycle
-      # ここまで、20+480=500cycle(250msec=500/2000)
-      set(pins, 0)
+      # ここまで、20+480=500cycle(250msec = 500cycles * 1/2000sec)
+      set(pins, 0) [19]
       nop()        [31]
       nop()        [31]
       nop()        [31]
@@ -577,7 +627,7 @@ for i in range(24):
       set(x, 14)              [18]  # 命令1cycle + 18cycle遅延 = 19cycle。スクラッチレジスタx にカウントをセット。
       label('loop_high')            # ラベルをセット ※cycleを食わない
       jmp(x_dec, 'loop_high') [31]  # 命令1cycle + 31cycle遅延 = 32cycle。ループで0～14まで15回実行するので、32*15=480cycle
-                                    # 1+19+480=500cycle(500/2000=250msec)
+                                    # 1+19+480=500cycle(500cycles * 1/2000sec = 250msec)
       set(pins, 0)
       set(x, 14)              [18]
       label('loop_low')
