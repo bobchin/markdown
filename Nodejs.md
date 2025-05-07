@@ -3,6 +3,7 @@
 - [目次](#目次)
 - [Node.js](#nodejs)
 	- [バージョンについて](#バージョンについて)
+	- [volta(Windows \& Mac)](#voltawindows--mac)
 	- [nodebrew(Mac)](#nodebrewmac)
 	- [fnm(Windows \& Mac)](#fnmwindows--mac)
 	- [nodist(Windows)](#nodistwindows)
@@ -30,6 +31,33 @@
 	- 8.x : Maintenance
 	- 9.x : No LTS
 	- 10.x: Active
+
+## volta(Windows & Mac)
+
+- [Volta](https://volta.sh/)
+
+- インストール
+
+	```cmd
+	# Windows
+	winget Volta.Volta
+	```
+
+- 操作
+
+		```bash
+		# node
+		volta install node@18
+
+		# パッケージにバージョンを固定する
+		# package.json に設定が保存される
+		# "volta": {
+		#	  "node": "18.x.x",
+		#	  "npm": "x.x.x",
+		# }
+		volta pin node@18
+		```
+
 
 ## nodebrew(Mac)
 
