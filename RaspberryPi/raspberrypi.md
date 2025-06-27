@@ -2,7 +2,9 @@
 
 - [Raspberry Pi](#raspberry-pi)
   - [ドキュメント等](#ドキュメント等)
-  - [Raspbian インストール](#raspbian-インストール)
+  - [ハードウェア](#ハードウェア)
+  - [ソフトウェア](#ソフトウェア)
+  - [Raspberry Pi OS(Raspbian) インストール](#raspberry-pi-osraspbian-インストール)
     - [Raspbian 設定](#raspbian-設定)
   - [SSD起動](#ssd起動)
   - [デバイス関連](#デバイス関連)
@@ -22,7 +24,55 @@
 - [インストール](https://www.raspberrypi.org/documentation/installation/)
 - [ダウンロード](https://www.raspberrypi.org/downloads/)
 
-## Raspbian インストール
+## ハードウェア
+
+- [ハードウェアリスト](https://www.raspberrypi.com/products/)
+  - PCタイプ
+    - Raspberry Pi 5
+    - Raspberry Pi 4 Model B
+    - Raspberry Pi 3 Model B+
+    - Raspberry Pi 3 Model B
+  - 産業用
+    - Raspberry Pi Compute Module 5
+    - Raspberry Pi Compute Module 4
+  - キーボードタイプ
+    - Raspberry Pi 500
+    - Raspberry Pi 400
+  - カードタイプ
+    - Raspberry Pi Zero 2 W
+    - Raspberry Pi Zero 2
+    - Raspberry Pi Zero W
+    - Raspberry Pi Zero
+  - マイコンタイプ
+    - Raspberry Pi Pico 2
+    - Raspberry Pi Pico
+
+## ソフトウェア
+
+- [Raspberry Pi OS](https://www.raspberrypi.com/software/)
+  - 種類
+    - Raspberry Pi OS with desktop
+      - GUI が入っている標準タイプ。アプリケーションは最低限のみ。
+    - Raspberry Pi OS with desktop and recommended software
+      - GUI が入っていて、さらに使えるアプリケーションが入っている
+    - Raspberry Pi OS Lite
+      - GUI なしで CUI のみ
+
+  - プラットフォーム
+    - Debian 12(bookworm) ベース
+      - Raspberry Pi OS(32bit)
+      - Raspberry Pi OS(64bit)
+    - Debian 11(bullseye) ベース
+      - Raspberry Pi OS(Legacy, 32bit)
+      - Raspberry Pi OS(Legacy, 64bit)
+
+- [Raspberry Pi Imager](https://www.raspberrypi.com/software/)
+  - デバイス選択
+    - ハードウェアを参考にする
+　- OS選択
+  　- ソフトウェアを参考にする
+
+## Raspberry Pi OS(Raspbian) インストール
 
 - OSの種類
   - Raspberry Pi OS (32-bit)
