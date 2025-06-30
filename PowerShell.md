@@ -2,8 +2,9 @@
 
 ## 参考
 
-- [https://news.mynavi.jp/itsearch/article/hardware](GUIユーザのためのPowerShell入門)
+- [GUIユーザのためのPowerShell入門](https://news.mynavi.jp/techplus/series/techp_powershell/)
 - [入門者の教科書 ～PowerShellをイチから学ぼう～](https://cheshire-wara.com/ps-textbooks/)
+- [とほほのPowerShell入門](https://www.tohoho-web.com/ex/power-shell.html)
 
 ## 種類
 
