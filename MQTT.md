@@ -13,6 +13,7 @@ Message Queuing Telemetry Transport.
     - [MQTTブローカー](#mqttブローカー)
     - [MQTTクライアント](#mqttクライアント)
   - [MicroPython で使う](#micropython-で使う)
+  - [ブローカー(Mosquitto)](#ブローカーmosquitto)
 
 ## Links
 
@@ -46,7 +47,7 @@ Message Queuing Telemetry Transport.
     - "#": マルチレベル
     - ex)
       - "sensor/+/temperature" => ⚪️"sensor/123/temperature"　✖️"sensor/123/abc/temperature"
-      - "sensor/+" => "sensor/abc"
+      - "sensor/+" => ⚪️"sensor/abc" ⚪️"sensor/123/abc/temperature"
 
 - QoS
   サービスの品質。3種類ある。
@@ -362,3 +363,43 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+
+## ブローカー(Mosquitto)
+
+- [Mosquitto](https://www.mosquitto.org/)
+  オープンソースの MQTT メッセージブローカー実装
+
+  - [Download](https://mosquitto.org/download/)
+
+    - Debian
+
+      ```bash
+      # GPGキー追加
+      wget http://repo.mosquitto.org/debian/mosquitto-repo.gpg.key
+      sudo apt-key add mosquitto-repo.gpg.key
+
+      # リポジトリの追加
+      cd /etc/apt/sources.list.d/
+      sudo wget http://repo.mosquitto.org/debian/mosquitto-bullseye.list
+      sudo apt-get update
+
+      apt-cache search mosquitto
+      apt-get install mosquitto
+      ```
+
+- QoS(Quality of Service) メッセージの品質
+  - Level 0: broker/client は、**確認なし**で **1 回だけ**メッセージを送信する。
+    - メッセージを失う可能性がある。
+  - Level 1: broker/client は、**確認あり**で、**少なくとも 1 回**メッセージを送信する。
+    - メッセージが重複する可能性がある。
+  - Level 2: broker/client は、**4ステップの確認を使って**、**必ず 1 回**メッセージを送信する。
+    - メッセージが重複せずに1回だけ配信されることが保証される。
+
+  - パブリッシャー（発信者）とサブスクライバ（購読者）のQoSが異なる場合、低い方に合わせる。
+    - パブリッシャーQoS > サブスクライバQoS => サブスクライバQoS
+    - パブリッシャーQoS =< サブスクライバQoS => パブリッシャーQoS
+      - ex) Pub QoS2, Sub QoS1 => QoS1
+      - ex) Pub QoS2, Sub QoS0 => QoS0
+      - ex) Pub QoS0, Sub QoS1 => QoS0
+
+- Retained Messages
