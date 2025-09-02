@@ -5,6 +5,12 @@
 - [ダウンロード](https://www.arduino.cc/en/software/)
 - [Arduino IDE 2 Document](https://docs.arduino.cc/software/ide/#ide-v2)
 
+- リファレンス
+  - [Language Reference](https://docs.arduino.cc/language-reference/)
+  - [Arduino日本語リファレンス](http://www.musashinodenpa.com/arduino/ref/)
+  - [MicroPython](https://docs.arduino.cc/micropython/)
+    - [Arduino Lab for MicroPython(MicroPython用の簡易エディタ)](https://labs.arduino.cc/en/labs/micropython)
+
 ## 環境構築
 
 - 日本語化
@@ -58,64 +64,114 @@
 
 - [プログラミング](https://docs.arduino.cc/programming/)
 
-  - 定数
-    - HIGH | LOW
-    - INPUT | OUTPUT | INPUT_PULLUP
-    - 数値
-      - 10進: 101   => 101
-      - 2進 : 0b101 => 2^2 + 2^0 = 5
-      - 8進 : 0101  => 8^2 + 8^0 = 65
-      - 16進: 0x101 => 16^2 + 16^0 = 257
-    - LED_BUILTIN
-    - true | false
+### 定数
 
-  - 型
-    - bool(boolean): true | false
-    - byte: 8bit unsigned number
-      - unsigned char: byteと同じ
-    - size_t: オブジェクトの大きさを表す
-    - array: 配列
-    - void: 関数で使用。何も返さないことを表す。
+- HIGH | LOW                   : degitalRead()|degitalWrite() 用
+- INPUT | OUTPUT | INPUT_PULLUP: pinMode() 用
+- 数値
+  - 10進: 101   => 101
+  - 2進 : 0b101 => 2^2 + 2^0 = 5
+  - 8進 : 0101  => 8^2 + 8^0 = 65
+  - 16進: 0x101 => 16^2 + 16^0 = 257
+- LED_BUILTIN: オンボードLEDのピン番号を表す定数
+- true | false
 
-    - 文字・文字列
-      - char: 文字
-        - シングルクォートで作成
-        - 内部的にはAsciiコードで保持した数値
-      - string: 文字列
-        - ダブルクォートで作成
-        - char の配列
-      - String(): 文字列オブジェクトを作成
+### 型
 
-    - 数値
-      - int   : 16bit
-      - long  : 32bit
-      - short : 16bit
-      - float : 32bit
-      - double: 32bit or 64bit(float と同じ)
-      - word  : 16bit unsigned
-      - byte  : 8bit unsigned
+- bool(boolean): true | false
+- byte: 8bit unsigned number(0-255)
+  - unsigned char: byteと同じ
+- size_t: オブジェクトの大きさを表す
+- array: 配列
+- void: 関数で使用。何も返さないことを表す。
 
-  - 大枠
-    - setup(): 初期設定。起動時に1回だけ走る。
-    - loop() : ループ処理。メイン処理を記述することになる。
+- 文字・文字列
+  - char: 文字
+    - シングルクォートで作成
+    - 内部的にはAsciiコードで保持した数値
+  - string: 文字列
+    - ダブルクォートで作成
+    - char の配列
+  - String(): 文字列オブジェクトを作成
 
-  - 演算
-    - 代入: =
+- 数値
+  - int   : 16bit
+  - long  : 32bit
+  - short : 16bit
+  - float : 32bit
+  - double: 32bit or 64bit(float と同じ)
+  - word  : 16bit unsigned
+  - byte  : 8bit unsigned
 
-    - 算術演算
-      - 加算: +
-      - 減算: -
-      - 乗算: *
-      - 除算: /
-      - 剰余: %
+#### 配列
 
-    - 比較演算
-      - 等価: ==
-      - 不等価: !=
-      - 大小: >, >=. <, <=
+```c
+int  myInts[6];                         // 初期化なし
+int  myPins[] = {2, 4, 8, 3, 6, 4};     // サイズ指定なし
+int  mySensVals[5] = {2, 4, -8, 3, 2};  // サイズ指定あり、初期化あり
+char message[6] = "hello";              // 文字列の場合は、サイズは文字数 + 1(null分)
 
-    - 論理演算
+int myArray[10]={9, 3, 2, 4, 3, 2, 7, 8, 9, 11};
+myArray[9];       // 11
+myArray[10];      // 不正アクセス
+myArray[0] = 10;  // 代入
+```
 
-    - ビット演算
-      - <<, >>, &, ~
+#### 文字・文字列
+
+```c
+char myChar = 'A';  // これとこれは同じもの
+char myChar = 65;   // ASCIIコード値が保存される
+
+// 文字列は、(1)string型 (2)charの配列 のどちらか
+char Str1[15];
+char Str2[8] = {'a', 'r', 'd', 'u', 'i', 'n', 'o'};
+char Str3[8] = {'a', 'r', 'd', 'u', 'i', 'n', 'o', '\0'};
+char Str4[] = "arduino";
+char Str5[8] = "arduino";
+char Str6[15] = "arduino";
+
+String thisString = String(13);       // "13"    10進指定の場合は、そのまま文字列
+String thisString = String(13, HEX);  // "d"     HEX指定の場合は、値の16進表示を文字列
+String thisString = String(20, HEX);  // "14"    HEX指定の場合は、値の16進表示を文字列
+String thisString = String(13, BIN);  // "1101"  BIN指定の場合は、値の2進表示を文字列
+```
+
+### 大枠
+
+- setup(): 初期設定。起動時に1回だけ走る。
+- loop() : ループ処理。メイン処理を記述することになる。
+
+### 演算
+
+- 代入: =
+
+- 算術演算
+  - 加算: +
+  - 減算: -
+  - 乗算: *
+  - 除算: /
+  - 剰余: %
+
+- 比較演算
+  - 等価: ==
+  - 不等価: !=
+  - 大小: >, >=. <, <=
+
+- 論理演算
+
+- ビット演算
+  - <<, >>, &, ~
+
+
+## Raspi Pico
+
+- [Arduino環境でRaspberry Pi Picoを使う](https://tamanegi-digick.com/it/rpipico/)
+
+- IDE インストール
+  - RP2040 ボードライブラリ
+    - [ボードマネージャ](https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json)
+
+
+
 
