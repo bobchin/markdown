@@ -3,7 +3,14 @@
 - [Windows Subsystem for Linux](#windows-subsystem-for-linux)
   - [参考](#参考)
   - [インストール](#インストール)
+  - [アンインストール](#アンインストール)
   - [使い方](#使い方)
+    - [Linux =\> Windows](#linux--windows)
+    - [Windows =\> Linux](#windows--linux)
+    - [Linux のコマンドを実行](#linux-のコマンドを実行)
+    - [zsh インストール](#zsh-インストール)
+    - [Oh my zsh](#oh-my-zsh)
+    - [import/export](#importexport)
 
 ## 参考
 
@@ -27,39 +34,59 @@
 - PowerShell からインストール
 
   ```PowerShell
-  wsl --install
+  # 状態確認
+  wsl -l -v
+
+  # インストール可能なディストリビューションを表示
+  wsl --list --online
+  # ディストリビューションを指定してインストール
+  wsl --install -d <distro>
+
+  # 状態確認
   wsl -l -v
   ```
 
-- ディストリビューション
+## アンインストール
+
+- [WSL:保存版！【完全削除】する手順](https://broaden-your-horizons.com/ai-ss/wsl/complete-uninstall/)
 
   ```PowerShell
-  wsl --list --online
-  wsl --install -d <distro>
+  # Linuxの全停止
+  wsl --shutdown
+
+  # Linuxの個別停止
+  wsl --terminate <distro>
+
+  # 停止確認(STATE=Stopped)
+  wsl -l -v
+
+  # 登録解除
+  wsl --unregister ubuntu
   ```
+
 
 ## 使い方
 
-- Linux => Windows
+### Linux => Windows
 
   ```sh
   # マウントされているのでアクセスできる
   cd /mnt/c/
   ```
 
-- Windows => Linux
+### Windows => Linux
 
   ```PowerShell
   cd \\wsl$\
   ```
 
-- Linux のコマンドを実行
+### Linux のコマンドを実行
 
   ```PowerShell
   wsl ls -la
   ```
 
-- zsh インストール
+### zsh インストール
 
   ```sh
   $ sudo apt install zsh
@@ -67,16 +94,24 @@
   $ chsh -s $(which zsh)
   ```
 
-  - [Oh my zsh](https://ohmyz.sh/)
+### [Oh my zsh](https://ohmyz.sh/)
 
-    ```sh
-    # curl
-    $ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    # wget
-    # sh -c "$(wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
+  ```sh
+  # curl
+  $ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  # wget
+  # sh -c "$(wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
 
-    # テーマ変更
-    # ~/.zshrc
-    # ZSH_THEME="robbyrussell"
-    ZSH_THEME="dpoggi"
-    ```
+  # テーマ変更
+  # ~/.zshrc
+  # ZSH_THEME="robbyrussell"
+  ZSH_THEME="dpoggi"
+  ```
+
+### import/export
+
+  ```sh
+  wsl --export Ubuntu-24.04 C:\WSL\ubuntu2404.tar [--format tar]
+  wsl --import copy_ubuntu C:\WSL\copy_ubuntu C:\WSL\ubuntu2404.tar --version 2
+  ```
+
