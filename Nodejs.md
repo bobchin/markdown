@@ -38,26 +38,33 @@
 
 - インストール
 
-	```cmd
-	# Windows
-	winget Volta.Volta
-	```
+```cmd
+# Windows
+winget Volta.Volta
+```
+
+- オートコンプリート
+
+```bash
+volta completions zsh _volta
+chmod a+x _volta
+mv _volta /usr/local/share/zsh/site-functions
+```
 
 - 操作
 
-		```bash
-		# node
-		volta install node@18
+```bash
+# node
+volta install node@18
 
-		# パッケージにバージョンを固定する
-		# package.json に設定が保存される
-		# "volta": {
-		#	  "node": "18.x.x",
-		#	  "npm": "x.x.x",
-		# }
-		volta pin node@18
-		```
-
+# パッケージにバージョンを固定する
+# package.json に設定が保存される
+# "volta": {
+#	  "node": "18.x.x",
+#	  "npm": "x.x.x",
+# }
+volta pin node@18
+```
 
 ## nodebrew(Mac)
 
