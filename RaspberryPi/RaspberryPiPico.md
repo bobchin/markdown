@@ -3,6 +3,7 @@
 - [RaspberryPi Pico](#raspberrypi-pico)
   - [参照](#参照)
   - [Windows の開発環境の作成](#windows-の開発環境の作成)
+    - [開発環境その他](#開発環境その他)
   - [Arduino IDE を使う](#arduino-ide-を使う)
   - [WebSocket 接続(arduinoWebSockets)](#websocket-接続arduinowebsockets)
   - [WebSocket 接続(WebSocket2\_Generic)](#websocket-接続websocket2_generic)
@@ -35,6 +36,48 @@
   - サンプルを起動
     - 「pico-examplesプロジェクト」を構成するかどうか聞かれたら、Yes
     - キットの選択は、「Pico ARM GCC – Pico SDK Toolchain with GCC arm-none-eabi」
+
+### 開発環境その他
+
+- [Thonny](https://thonny.org/)
+  これを使うのが一番楽か？
+  - ライブラリ(MicoryPython Library) もインストールできる
+    「ツール」- 「プラグインを管理」でライブラリ名をいれて検索
+
+- mip(upip)
+
+  **※pico 自体がネットワークに接続する場合に使う**
+
+  ```python
+  # mip がなければ、下記を "lib" フォルダにいれる？
+  # https://github.com/micropython/micropython-lib/tree/master/micropython/mip
+
+  import mip
+  mip.install("package")
+  mip.install("package", version="x.y")
+  mip.install("package", mpy=False)
+  ```
+
+- [mpremote](https://micropython-docs-ja.readthedocs.io/ja/latest/reference/mpremote.html)
+
+  **※pico 自体がネットワークに接続できたに場合に、ネットはPCを経由しUSB/UART経由で渡される**
+
+  ```python
+  # PC に mpremote をインストールする
+  pip install mpremote
+
+  # pico にアクセスする
+  mpremote
+
+  # リスト表示
+  mpremote connect list
+
+  # ライブラリをインストール
+  mpremote mip install <package>
+
+  # ファイルリストを表示
+  mpremote fs ls
+  ```
 
 ## Arduino IDE を使う
 
