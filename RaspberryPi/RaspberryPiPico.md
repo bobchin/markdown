@@ -69,6 +69,10 @@
   # pico にアクセスする
   mpremote
 
+  # python の REPL
+  mpremote repl
+  # ctrl + c で入れる？
+
   # リスト表示
   mpremote connect list
 
